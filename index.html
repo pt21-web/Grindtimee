@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#060607">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GrindTime">
+<title>GrindTime</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="description" content="GrindTime – looks, gym and A-level study tracker">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#060607; --card:#111113; --card2:#1a1a1d; --line:#26262b;
+  --text:#f4f4f5; --mute:#8d8d96; --accent:#ff2d45; --accent-ink:#ffffff; --accent2:#b3001b;
+  --good:#4ade80; --goodbg:#11281a;
+  --warn:#ff7b6b; --amber:#ffc14d; --blue:#ff8794; --violet:#ff5468; --r:18px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg) radial-gradient(130% 55% at 50% -12%,#3a0710 0%,#14040700 62%) no-repeat fixed;color:var(--text);font-family:Inter,system-ui,sans-serif;font-size:15px;line-height:1.45}
+body{padding:env(safe-area-inset-top) 0 calc(84px + env(safe-area-inset-bottom))}
+body.lock{overflow:hidden}
+h1,h2,h3{font-family:"Space Grotesk",Inter,sans-serif;margin:0;letter-spacing:-.01em}
+.wrap{max-width:560px;margin:0 auto;padding:18px 16px}
+header.top{display:flex;justify-content:space-between;align-items:flex-end;margin:6px 0 14px;gap:10px}
+header.top .date{color:var(--mute);font-size:13px}
+header.top h1{font-size:28px}
+.pill{display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--line);padding:8px 12px;border-radius:999px;font-weight:600;white-space:nowrap;font-size:13.5px}
+.pill b{font-family:"Space Grotesk";font-size:18px;color:var(--accent)}
+.intro{color:var(--mute);font-size:13.5px;margin:0 2px 14px}
+.seg{display:flex;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:4px;gap:4px;margin-bottom:14px}
+.seg button{flex:1;border:0;background:none;color:var(--mute);font:inherit;font-weight:600;padding:9px 6px;border-radius:10px;cursor:pointer;font-size:14px}
+.seg button.on{background:var(--card2);color:var(--text)}
+.sv{display:none}.sv.on{display:block}
+.view{display:none}.view.on{display:block}
+
+/* home */
+.hcard{display:block;width:100%;text-align:left;border:1px solid var(--line);border-radius:24px;padding:20px;margin-bottom:14px;cursor:pointer;color:var(--text);font:inherit;position:relative;overflow:hidden}
+.hcard h2{font-size:30px}
+.hcard p{margin:4px 0 0;color:#c9cdd6;font-size:14px}
+.hcard .stats{display:flex;gap:18px;margin-top:14px}
+.hcard .stats div{font-size:12.5px;color:var(--mute)}
+.hcard .stats b{display:block;font-family:"Space Grotesk";font-size:22px;color:var(--text)}
+.hcard .glyph{position:absolute;right:-10px;top:-10px;font-size:110px;opacity:.12}
+.h-asc{background:linear-gradient(140deg,#4a0a14,#141012 62%)}
+.h-gym{background:linear-gradient(140deg,#2e0a10,#111113 62%)}
+.h-stu{background:linear-gradient(140deg,#5c0d19,#1a0a0d 40%,#111113 70%)}
+.hcard{border-color:#2e1418!important;box-shadow:0 14px 36px -20px rgba(255,30,60,.55),inset 0 1px 0 rgba(255,255,255,.04)}
+.hcard .glyph{color:var(--accent);opacity:.18!important}
+.hcard .stats b{color:#fff}
+.cont{margin-top:12px;font-size:13px;color:var(--violet)}
+.brand{font-family:"Space Grotesk";font-weight:700;letter-spacing:.22em;font-size:14px;color:#fff;margin-top:4px}
+.brand span{color:var(--accent);text-shadow:0 0 14px rgba(255,45,69,.6)}
+.plan{display:flex;align-items:center;gap:12px;padding:11px 16px;cursor:pointer;width:100%;background:none;border:0;color:var(--text);font:inherit;text-align:left}
+.plan+.plan{border-top:1px solid var(--line)}
+.plan .t{flex:1}.plan .t small{display:block;color:var(--mute);font-size:12.5px}
+.plan .dot{width:24px;height:24px;border-radius:8px;flex:none;display:grid;place-items:center;font-size:13px;background:var(--card2)}
+.plan.ok .dot{background:var(--accent);color:var(--accent-ink);font-weight:700}
+.exam{display:flex;align-items:center;gap:12px;padding:10px 16px}
+.exam+.exam{border-top:1px solid var(--line)}
+.exam .d{font-family:"Space Grotesk";font-weight:700;font-size:22px;min-width:52px;text-align:center;line-height:1}
+.exam .d small{display:block;font-family:Inter;font-weight:500;font-size:10.5px;color:var(--mute)}
+.exam .t{flex:1}.exam .t small{display:block;color:var(--mute);font-size:12.5px}
+.focus{display:flex;align-items:center;gap:14px}
+.focus .clock{font-family:"Space Grotesk";font-weight:700;font-size:40px;font-variant-numeric:tabular-nums;line-height:1}
+.term-in{font-size:18px;padding:12px 14px}
+#notifPad .item.done .t>span{text-decoration:none;color:var(--text)}
+
+/* figure */
+.stage{background:radial-gradient(120% 80% at 50% 30%,#2a0a10 0%,var(--card) 62%);border:1px solid var(--line);border-radius:22px;padding:14px 10px 10px;position:relative}
+.stage svg{display:block;margin:0 auto;width:100%;max-width:300px;height:auto}
+.stage svg.bodyfig{max-width:210px}
+.rg{cursor:pointer;transition:fill .35s}
+.rg:hover,.rg:focus{filter:brightness(1.15);outline:none}
+.deco{fill:#2a2e37;pointer-events:none}
+.stage .meta{display:flex;justify-content:space-between;align-items:center;padding:6px 8px 2px}
+.stage .meta .big{font-family:"Space Grotesk";font-weight:700;font-size:26px}
+.stage .meta small{color:var(--mute);display:block;font-size:12.5px}
+.flip{border:1px solid var(--line);background:var(--card2);color:var(--text);font:inherit;font-size:13px;padding:7px 12px;border-radius:999px;cursor:pointer}
+.hint{position:absolute;top:12px;left:14px;font-size:12px;color:var(--mute)}
+.days{display:flex;gap:4px;margin-top:6px}
+.days span{width:12px;height:12px;border-radius:3px;background:var(--card2);border:1px solid var(--line)}
+.days .l1{background:#5a0f19;border-color:#5a0f19}.days .l2{background:#a3172a;border-color:#a3172a}.days .l3{background:var(--accent);border-color:var(--accent)}
+.chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin-top:12px}
+.rchip{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:left;color:var(--text);font:inherit;cursor:pointer;position:relative;overflow:hidden}
+.rchip b{display:block;font-weight:600;font-size:14px}
+.rchip small{color:var(--mute);font-size:12px}
+.rchip .bar{position:absolute;left:0;bottom:0;height:3px;background:var(--accent);transition:width .3s}
+
+/* sheet */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.55);opacity:0;pointer-events:none;transition:.25s;z-index:20}
+.scrim.on{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;transform:translateY(105%);transition:transform .3s cubic-bezier(.2,.8,.2,1);display:flex;justify-content:center}
+.sheet.on{transform:none}
+.sheet .in{background:var(--card);border:1px solid var(--line);border-bottom:0;border-radius:24px 24px 0 0;width:100%;max-width:560px;max-height:84vh;overflow-y:auto;padding:10px 0 calc(20px + env(safe-area-inset-bottom))}
+.grab{width:40px;height:5px;border-radius:9px;background:var(--line);margin:0 auto 10px}
+.sh-head{display:flex;justify-content:space-between;align-items:center;padding:0 18px 10px}
+.sh-head h2{font-size:22px}
+.sh-head small{color:var(--mute);display:block}
+.x{background:var(--card2);border:0;color:var(--text);width:34px;height:34px;border-radius:50%;font-size:18px;cursor:pointer;flex:none}
+.sub{font-size:12.5px;color:var(--mute);font-weight:600;text-transform:uppercase;letter-spacing:.06em;padding:14px 18px 6px;display:flex;justify-content:space-between}
+.sub button{background:none;border:0;color:var(--blue);font:inherit;font-size:12.5px;text-transform:none;letter-spacing:0;cursor:pointer}
+.item{display:flex;align-items:center;gap:12px;padding:12px 18px;cursor:pointer;user-select:none}
+.item+.item{border-top:1px solid var(--line)}
+.check{width:26px;height:26px;border-radius:9px;border:2px solid var(--line);flex:none;display:grid;place-items:center;transition:.15s}
+.item.done .check{background:var(--accent);border-color:var(--accent);box-shadow:0 0 10px rgba(255,45,69,.45)}
+.item.done .check::after{content:"";width:10px;height:6px;border-left:2.5px solid #fff;border-bottom:2.5px solid #fff;transform:rotate(-45deg) translate(1px,-1px)}
+.item .t{flex:1}
+.item .t small{display:block;color:var(--mute);font-size:12.5px}
+.item.done .t>span{color:var(--mute);text-decoration:line-through;text-decoration-color:#555}
+.rm{background:none;border:0;color:var(--warn);font:inherit;font-size:13px;cursor:pointer;padding:4px}
+.tipl{padding:0 18px}
+.tipl p{margin:0 0 8px;color:#c9cdd6;font-size:14px;padding-left:14px;position:relative}
+.tipl p::before{content:"";position:absolute;left:0;top:8px;width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.tipl p.no::before{background:var(--warn)}
+.ex{display:flex;align-items:center;gap:10px;padding:11px 18px}
+.ex+.ex{border-top:1px solid var(--line)}
+.ex .t{flex:1}.ex .t small{display:block;color:var(--mute);font-size:12.5px}
+.wk{margin:4px 18px 0;background:var(--card2);border-radius:12px;padding:12px 14px}
+.wk .row1{display:flex;justify-content:space-between;font-size:13.5px}
+.track{height:8px;background:var(--line);border-radius:9px;margin-top:8px;overflow:hidden}
+.track i{display:block;height:100%;background:var(--accent);border-radius:9px;transition:width .3s}
+
+.add{display:flex;gap:8px;padding:12px 18px;flex-wrap:wrap}
+.add input{flex:1}
+.btn{border:0;border-radius:12px;padding:10px 14px;font:inherit;font-weight:600;cursor:pointer;background:var(--card2);color:var(--text)}
+.btn.vio{background:linear-gradient(135deg,#ff2d45,#a0001a);color:#fff;box-shadow:0 8px 22px -12px rgba(255,45,69,.8)}
+.btn.pri{background:linear-gradient(135deg,#ff4d61,#d90026);color:#fff;box-shadow:0 8px 22px -12px rgba(255,45,69,.8)}
+.btn.sm{padding:7px 11px;font-size:13px;border-radius:10px}
+.btn.wide{width:100%}
+.btn:disabled{opacity:.5;cursor:default}
+input,select,textarea{background:var(--card2);border:1px solid var(--line);color:var(--text);border-radius:12px;padding:10px 12px;font:inherit;min-width:0;width:100%}
+textarea{min-height:110px;resize:vertical}
+label.f{display:block;font-size:12.5px;color:var(--mute);margin-bottom:4px}
+
+section.block{background:linear-gradient(180deg,#141416,#0f0f11);border:1px solid var(--line);border-radius:var(--r);padding:6px 0;margin-bottom:14px}
+section.block>h2{font-size:15px;color:var(--mute);font-weight:500;padding:10px 16px 4px;display:flex;justify-content:space-between}
+section.block .item{padding:12px 16px}
+.pad{padding:12px 16px}
+.tag{font-size:11px;padding:3px 8px;border-radius:999px;background:var(--card2);color:var(--mute);white-space:nowrap}
+.tag.due{background:#3a2a12;color:var(--amber)}.tag.ok{background:var(--goodbg);color:var(--good)}
+
+.logger{padding:14px 16px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.logger .full{grid-column:1/-1}
+.set{display:flex;align-items:center;gap:10px;padding:10px 16px}
+.set+.set{border-top:1px solid var(--line)}
+.set .t{flex:1}.set .t small{color:var(--mute)}
+.mbar{display:grid;grid-template-columns:80px 1fr 44px;gap:10px;align-items:center;padding:7px 16px;font-size:13.5px}
+.mbar span:last-child{text-align:right;color:var(--mute)}
+.plan{padding:4px 16px 12px;font-size:14px;color:#c9cdd6}
+.plan ol{margin:6px 0 0;padding-left:20px}.plan li{margin:3px 0}
+
+.cat{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;margin-bottom:8px;scrollbar-width:none}
+.cat::-webkit-scrollbar{display:none}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--text);padding:8px 14px;border-radius:999px;font:inherit;font-size:13.5px;white-space:nowrap;cursor:pointer}
+.chip.on{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
+.tip{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;margin-bottom:10px}
+.tip h3{font-size:16px;margin-bottom:6px;display:flex;gap:8px;align-items:center;justify-content:space-between}
+.tip p{margin:0;color:#c9cdd6;font-size:14px}
+.tip .src{margin-top:8px;font-size:12px;color:var(--mute)}
+.tip.bad{border-color:#4a2520}
+.ev{font-family:Inter;font-size:11px;font-weight:600;padding:3px 8px;border-radius:999px;white-space:nowrap}
+.ev.s{background:var(--goodbg);color:var(--good)}.ev.m{background:#2a1418;color:#ff9aa5}.ev.x{background:#3a1c18;color:var(--warn)}
+.note{background:#1a0e10;border:1px solid #3a1a1f;color:#f1d4d8;border-radius:var(--r);padding:12px 14px;font-size:13.5px;margin-bottom:14px}
+.note.warn{background:#3a2a12;border-color:#5a4220;color:#ffe2b0}
+
+/* food */
+.kcal{display:flex;gap:12px;padding:14px 16px}
+.kcal div{flex:1;background:var(--card2);border-radius:14px;padding:12px}
+.kcal b{display:block;font-family:"Space Grotesk";font-size:26px}
+.kcal small{color:var(--mute)}
+.filebtn{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;gap:8px}
+.filebtn input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.prev{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.prev img{width:72px;height:72px;object-fit:cover;border-radius:10px;border:1px solid var(--line)}
+.spin{display:inline-block;width:16px;height:16px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:sp 1s linear infinite;vertical-align:-3px}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* study */
+.subj{display:block;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;margin-bottom:12px;cursor:pointer;color:var(--text);font:inherit}
+.subj h3{font-size:20px}.subj small{color:var(--mute)}
+.mini{display:flex;flex-wrap:wrap;gap:3px;margin-top:10px}
+.mini i{width:14px;height:14px;border-radius:4px;display:block}
+.back{background:none;border:0;color:var(--blue);font:inherit;font-size:14px;cursor:pointer;padding:0;margin-bottom:6px}
+.mod h4{font-family:"Space Grotesk";font-size:14px;color:var(--mute);font-weight:500;margin:18px 2px 8px}
+.topic{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:8px;cursor:pointer;width:100%;color:var(--text);font:inherit;text-align:left}
+.topic .sw{width:12px;align-self:stretch;border-radius:6px;flex:none}
+.topic .t{flex:1}.topic .t small{display:block;color:var(--mute);font-size:12px}
+.lv{font-size:11.5px;font-weight:700;padding:4px 9px;border-radius:999px;white-space:nowrap}
+.legend{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 6px}
+.legend span{font-size:11px;padding:3px 8px;border-radius:999px;font-weight:600}
+.qcard{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;margin-bottom:14px}
+.qcard .qh{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px}
+.qtext{white-space:pre-wrap;font-size:15.5px;line-height:1.55}
+.marks{font-weight:700;color:var(--violet);font-size:13px;white-space:nowrap}
+.ladder{display:flex;gap:4px;margin:10px 0 2px}
+.ladder i{flex:1;height:8px;border-radius:4px;background:var(--line)}
+.res{border-radius:20px;padding:16px;margin-bottom:14px;border:1px solid var(--line);background:var(--card)}
+.score{font-family:"Space Grotesk";font-size:40px;font-weight:700}
+.pt{display:flex;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:14px}
+.pt .ic{flex:none;width:22px;height:22px;border-radius:7px;display:grid;place-items:center;font-size:13px;font-weight:700}
+.pt .ic.y{background:var(--goodbg);color:var(--good)}.pt .ic.n{background:#3a1c18;color:var(--warn)}
+.pt small{display:block;color:var(--mute)}
+.fix{background:var(--card2);border-radius:12px;padding:10px 12px;margin-top:8px;font-size:14px}
+.fix s{color:var(--warn);text-decoration-color:var(--warn)}
+.fix ins{color:var(--accent);text-decoration:none}
+details{margin-top:12px}
+.anno{position:relative;margin-top:10px;border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+.anno img{display:block;width:100%;height:auto}
+.anno .bx{position:absolute;border:2.5px solid;border-radius:6px;pointer-events:none}
+.anno .bx.correct{border-color:#7ee05a;background:rgba(126,224,90,.12)}
+.anno .bx.wrong{border-color:#ff6b5b;background:rgba(255,107,91,.14)}
+.anno .bx.vague{border-color:#ffc14d;background:rgba(255,193,77,.14)}
+.anno .bdg{position:absolute;transform:translate(-40%,-55%);width:22px;height:22px;border-radius:50%;font-size:12px;font-weight:700;display:grid;place-items:center;color:#111;border:0;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.5)}
+.bdg.correct,.num.correct{background:#7ee05a}.bdg.wrong,.num.wrong{background:#ff6b5b}.bdg.vague,.num.vague{background:#ffc14d}.num.missing{background:#7ab8ff}
+.anno.off .bx,.anno.off .bdg{display:none}
+.trans{white-space:pre-wrap;background:var(--card2);border-radius:12px;padding:12px;margin-top:10px;font-size:14.5px;line-height:1.7}
+.trans mark{color:inherit;border-radius:4px;padding:1px 2px}
+.trans mark.correct{background:rgba(126,224,90,.25);box-shadow:inset 0 -2px #7ee05a}
+.trans mark.wrong{background:rgba(255,107,91,.25);box-shadow:inset 0 -2px #ff6b5b}
+.trans mark.vague{background:rgba(255,193,77,.25);box-shadow:inset 0 -2px #ffc14d}
+.trans sup{font-size:10px;font-weight:700;margin-left:1px}
+.ann{display:flex;gap:10px;padding:10px 0;border-top:1px solid var(--line);font-size:14px}
+.ann.hot{background:rgba(185,162,255,.08)}
+.ann .num{flex:none;width:22px;height:22px;border-radius:50%;font-size:12px;font-weight:700;display:grid;place-items:center;color:#111}
+.ann q{display:block;font-style:italic;color:#c9cdd6;quotes:"“" "”"}
+.ann .fx{color:var(--accent);margin-top:3px}
+.keyrow{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--mute);margin-top:8px}
+.keyrow i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+summary{cursor:pointer;color:var(--blue);font-weight:600}
+.model{white-space:pre-wrap;background:var(--card2);border-radius:12px;padding:12px;margin-top:8px;font-size:14px}
+.selfm .item{padding:10px 0}
+
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:rgba(14,15,18,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);display:flex;justify-content:center;padding:8px 8px calc(8px + env(safe-area-inset-bottom));z-index:10}
+nav.tabs .in{display:flex;max-width:560px;width:100%;justify-content:space-around}
+nav.tabs button{background:none;border:0;color:var(--mute);font:inherit;font-size:11.5px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 12px;cursor:pointer}
+nav.tabs button.on{color:var(--accent)}
+nav.tabs button{position:relative}
+nav.tabs button.on::after{content:"";position:absolute;top:-9px;left:30%;right:30%;height:3px;border-radius:0 0 4px 4px;background:var(--accent);box-shadow:0 0 12px var(--accent)}
+
+nav.tabs svg{width:24px;height:24px}
+.toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);background:var(--accent);color:var(--accent-ink);padding:10px 16px;border-radius:999px;font-weight:600;opacity:0;transition:.25s;pointer-events:none;z-index:30;white-space:nowrap;max-width:92vw;overflow:hidden;text-overflow:ellipsis}
+.toast.on{opacity:1;transform:translateX(-50%)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- HOME -->
+<div class="view on" id="v-home">
+  <div class="brand">GRIND<span>TIME</span></div>
+  <header class="top"><div><div class="date" id="homeDate"></div><h1 id="greet">Hey</h1></div></header>
+  <section class="block" id="plan"><h2><span>Today's grind</span><span id="planPct"></span></h2><div id="planList"></div></section>
+  <button class="hcard h-asc" data-go="ascend"><span class="glyph">✦</span><h2>Ascend</h2><p>Skincare, grooming and looks, tracked daily</p>
+    <div class="stats"><div><b id="hAscP">0%</b>face today</div><div><b id="hAscS">0</b>day streak</div></div></button>
+  <button class="hcard h-gym" data-go="gym"><span class="glyph">◆</span><h2>Gym</h2><p>Training log, muscle map and calories</p>
+    <div class="stats"><div><b id="hGymS">0</b>sets this week</div><div><b id="hGymK">0</b>kcal today</div></div></button>
+  <button class="hcard h-stu" data-go="study"><span class="glyph">✎</span><h2>Study</h2><p>OCR A Biology · AQA Chemistry · Edexcel Maths</p>
+    <div class="stats"><div><b id="hStuQ">0</b>questions done</div><div><b id="hStuM">0</b>topics upgraded</div></div>
+    <div class="cont" id="hCont"></div></button>
+  <section class="block"><h2><span>📅 Exams & tests</span></h2><div id="examList"></div>
+    <form class="add" id="examForm" style="padding:10px 16px"><input placeholder="e.g. Chem carbonyls test" maxlength="50" required style="flex:2 1 160px"><input type="date" required style="flex:1 1 130px"><button class="btn pri sm">Add</button></form></section>
+  <section class="block" id="notifBox" hidden><h2><span>🔔 Notifications</span><span id="notifState"></span></h2><div class="pad" id="notifPad"></div></section>
+  <section class="block" id="aiBox" hidden><h2><span>🤖 AI settings</span><span id="aiState"></span></h2><div class="pad" id="aiPad"></div></section>
+  <section class="block"><h2><span>💾 Backup</span></h2><div class="pad">
+    <div style="font-size:13px;color:var(--mute);margin-bottom:10px">Your progress lives in this browser only. Copy a backup now and then and keep it somewhere safe, like your Notes app. Paste it back to restore on a new phone or after clearing your browser.</div>
+    <div class="row2"><button class="btn" id="bkCopy">Copy backup</button><button class="btn" id="bkShow">Restore…</button></div>
+    <div id="bkRestore" hidden style="margin-top:10px"><textarea id="bkText" placeholder="Paste your backup here"></textarea><button class="btn pri wide" id="bkGo" style="margin-top:8px">Restore this backup</button></div>
+  </div></section>
+  <div style="text-align:center;color:var(--mute);font-size:12px;margin:6px 0 10px">GrindTime works on WiFi or mobile data. Photos are shrunk before sending to save data.</div>
+</div>
+
+<!-- ASCEND -->
+<div class="view" id="v-ascend">
+  <header class="top"><div><div class="date" id="dateLbl"></div><h1>Ascend</h1></div><div class="pill">🔥 <b id="streakN">0</b> day streak</div></header>
+  <div class="seg" data-seg="ascend"><button data-s="face" class="on">Face</button><button data-s="upkeep">Upkeep</button><button data-s="guide">Guide</button></div>
+  <div class="sv on" id="ascend-face">
+    <div class="stage"><div class="hint">Tap a feature</div><div id="faceFig"></div>
+      <div class="meta"><div><span class="big" id="faceBig">0%</span><small>face routine done today</small><div class="days" id="days"></div></div></div></div>
+    <div class="chips" id="faceChips"></div>
+  </div>
+  <div class="sv" id="ascend-upkeep">
+    <p class="intro">Things that don't need doing every day. Tap one when you've done it and it'll tell you when it's next due.</p>
+    <section class="block" id="periodic"></section>
+  </div>
+  <div class="sv" id="ascend-guide">
+    <p class="intro">Pulled from skincare and grooming forums, then checked against the NHS, dermatologists and research.</p>
+    <div class="cat" id="cats"></div><div id="tips"></div>
+  </div>
+</div>
+
+<!-- GYM -->
+<div class="view" id="v-gym">
+  <header class="top"><div><div class="date">Train · log · fuel</div><h1>Gym</h1></div><div class="pill">🏋️ <b id="wkSets">0</b> sets / 7d</div></header>
+  <div class="seg" data-seg="gym"><button data-s="body" class="on">Body</button><button data-s="log">Log</button><button data-s="food">Calories</button></div>
+  <div class="sv on" id="gym-body">
+    <div class="stage"><div class="hint">Tap a muscle group</div><div id="bodyFig"></div>
+      <div class="meta"><div><span class="big" id="bodyBig">0%</span><small>of weekly training target</small></div><button class="flip" id="flip">↻ Show back</button></div></div>
+    <div class="chips" id="bodyChips"></div>
+  </div>
+  <div class="sv" id="gym-log">
+    <section class="block"><h2><span>Log a set</span></h2>
+      <form class="logger" id="logger">
+        <div class="full"><label class="f" for="exSel">Exercise</label><select id="exSel"></select></div>
+        <div><label class="f" for="wIn">Weight (kg) – optional</label><input id="wIn" type="number" inputmode="decimal" min="0" step="0.5" placeholder="Bodyweight"></div>
+        <div><label class="f" for="rIn" id="rLbl">Reps</label><input id="rIn" type="number" inputmode="numeric" min="1" step="1" placeholder="10" required></div>
+        <button class="btn pri full">Add set</button>
+      </form></section>
+    <section class="block"><h2><span>Today</span><span id="todayCount"></span></h2><div id="todaySets"></div></section>
+    <section class="block"><h2><span>Muscles · last 7 days</span><span>sets</span></h2><div id="mbars" style="padding-bottom:8px"></div></section>
+    <section class="block"><h2><span>Starter plan</span></h2>
+      <div class="plan">Full body, 3 days a week with a rest day between (e.g. Mon / Wed / Fri). Do 3 sets of 8–12 reps each:
+        <ol><li>Squats or lunges</li><li>Push-ups or bench press</li><li>Rows or pull-ups</li><li>Overhead press</li><li>Romanian deadlift or glute bridge</li><li>Plank, 3 × 30 seconds</li></ol>
+        Add a rep or a little weight once all 3 sets feel solid. That's progressive overload, the thing that actually builds muscle.</div></section>
+    <section class="block"><h2><span>History</span></h2><div id="hist"></div></section>
+    <div class="note">Learn your form with light weights first. Sleep and rest days are when muscle grows. Never take steroids or SARMs.</div>
+  </div>
+  <div class="sv" id="gym-food">
+    <section class="block"><h2><span>Today</span><span id="foodDate"></span></h2>
+      <div class="kcal"><div><b id="kTot">0</b><small>kcal</small></div><div><b id="pTot">0g</b><small>protein</small></div></div></section>
+    <section class="block"><h2><span>Add food</span></h2>
+      <div class="pad">
+        <div class="row2">
+          <label class="btn vio filebtn" id="photoFoodBtn">📷 Photo of food<input type="file" accept="image/*" id="foodPhoto"></label>
+          <label class="btn filebtn" id="labelFoodBtn">🏷️ Snap the label<input type="file" accept="image/*" id="foodLabel"></label>
+        </div>
+        <input id="foodNote" placeholder="Optional: portion info, e.g. 'ate half', '250 g'" style="margin-top:10px">
+        <div id="foodAI" style="margin-top:10px"></div>
+        <div style="margin-top:14px;color:var(--mute);font-size:12.5px">Or add it yourself</div>
+        <form id="manualFood" class="row2" style="margin-top:6px;grid-template-columns:1fr 80px 80px auto;display:grid;gap:8px">
+          <input placeholder="Food" required maxlength="60"><input type="number" placeholder="kcal" inputmode="numeric" min="0" required><input type="number" placeholder="prot g" inputmode="decimal" min="0"><button class="btn pri sm">Add</button>
+        </form>
+      </div></section>
+    <section class="block"><h2><span>Logged today</span></h2><div id="foodList"></div></section>
+    <div class="note">Photo estimates can be quite far off, because AI can't see oil, sauces or exact portions. A label photo is much more accurate. Barcode lookups need an internet food database the app can't reach, so snap the nutrition label instead.</div>
+  </div>
+</div>
+
+<!-- STUDY -->
+<div class="view" id="v-study">
+  <div id="studyRoot"></div>
+</div>
+
+</div>
+
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true"><div class="in" id="sheetIn"></div></div>
+
+<nav class="tabs"><div class="in">
+  <button data-v="home" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7v9a1 1 0 01-1 1h-4v-6h-6v6H5a1 1 0 01-1-1z"/></svg>Home</button>
+  <button data-v="ascend"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="7" r="4"/><path d="M4 21c1-4.5 4.5-7 8-7s7 2.5 8 7"/></svg>Ascend</button>
+  <button data-v="gym"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9v6M6 6v12M18 6v12M21 9v6M6 12h12"/></svg>Gym</button>
+  <button data-v="study"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8l10-5 10 5-10 5z"/><path d="M6 10v5c3 3 9 3 12 0v-5"/></svg>Study</button>
+</div></nav>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+"use strict";
+function $(id){return document.getElementById(id)}
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const dk=d=>{const x=new Date(d);return x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0")+"-"+String(x.getDate()).padStart(2,"0")};
+const today=()=>dk(new Date());
+let tt;function toast(m){const t=$("toast");t.textContent=m;t.classList.add("on");clearTimeout(tt);tt=setTimeout(()=>t.classList.remove("on"),2000)}
+
+/* ================= STATE ================= */
+const KEY="upkeep.v2";let S;
+try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+if(!S||typeof S!=="object")S={};
+S.log=S.log||{};S.per=S.per||{};S.gym=S.gym||[];S.custom=S.custom||{};S.hidden=S.hidden||{};
+S.food=S.food||{};S.study=S.study||{};S.study.m=S.study.m||{};S.study.att=S.study.att||[];S.study.gen=S.study.gen||{};S.study.done=S.study.done||{};
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast("Couldn't save – storage full?")}try{queueNudge()}catch(e){}}
+
+/* ================= AI ================= */
+/* Two AI routes: (1) inside claude.ai the built-in Claude; (2) in the standalone/APK build, the user's own Anthropic API key. */
+let AI=null,AIimg=false,AISRC=null;
+const KKEY="grindtime.apikey",MKEY="grindtime.model";
+const getKey=()=>{try{return localStorage.getItem(KKEY)||""}catch(e){return ""}};
+const getModel=()=>{try{return localStorage.getItem(MKEY)||"claude-sonnet-5-5"}catch(e){return "claude-sonnet-5-5"}};
+const b64=blob=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(",")[1]);r.onerror=rej;r.readAsDataURL(blob)});
+function makeApiAI(){const f=async(prompt,opts)=>{opts=opts||{};const content=[];
+    for(const im of (opts.images||[]))content.push({type:"image",source:{type:"base64",media_type:im.type&&im.type.startsWith("image/")?im.type:"image/jpeg",data:await b64(im)}});
+    content.push({type:"text",text:String(prompt)});
+    let res;try{res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"content-type":"application/json","x-api-key":getKey(),"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+      body:JSON.stringify({model:opts.modelTier==="quick"?"claude-haiku-5-5":getModel(),max_tokens:6000,messages:[{role:"user",content}]})})}
+    catch(e){throw {code:"offline",message:"No internet connection. The AI needs WiFi or mobile data."}}
+    let j=null;try{j=await res.json()}catch(e){}
+    if(!res.ok){const msg=j&&j.error&&j.error.message||("HTTP "+res.status);
+      if(res.status===401)throw {code:"bad_key",message:"Your API key was rejected. Check it in Home → AI settings."};
+      if(res.status===429||res.status===529)throw {code:"rate_limited",message:msg};
+      throw {code:"api",message:"AI error: "+msg}}
+    return {text:(j.content||[]).filter(c=>c.type==="text").map(c=>c.text).join("")}};
+  f.limits=async()=>({images:true});return f}
+const aiReady=(async()=>{await null;try{if(window.claude&&typeof window.claude.use==="function"){const s=await window.claude.use("sample");
+  if(s){AI=s;AISRC="claude";try{const l=await s.limits();AIimg=!!(l&&l.images)}catch(e){}}}}catch(e){}
+  if(!AI&&getKey()){AI=makeApiAI();AISRC="key";AIimg=true}
+  refreshAIBits()})();
+function setKey(k){try{if(k)localStorage.setItem(KKEY,k);else localStorage.removeItem(KKEY)}catch(e){}
+  if(AISRC!=="claude"){AI=k?makeApiAI():null;AISRC=k?"key":null;AIimg=!!k}}
+function parseJSON(t){if(t&&typeof t==="object")return t;const m=String(t||"").match(/\{[\s\S]*\}/);if(!m)throw new Error("No JSON in reply");return JSON.parse(m[0])}
+async function ask(prompt,images,tier){
+  if(!AI)throw {code:"no_ai",message:"AI isn't set up."};
+  const opts={modelTier:tier||"default"};if(images&&images.length&&AIimg)opts.images=images;
+  let out;
+  if(typeof AI.json==="function"){try{out=await AI.json(prompt,opts);return parseJSON(out)}catch(e){if(e&&(e.code==="not_granted"||e.code==="rate_limited"))throw e}}
+  const r=await AI(prompt,opts);return parseJSON(r.text);
+}
+function aiErr(e){const c=e&&e.code;
+  if(c==="not_granted")return "AI access wasn't allowed. You can allow it next time you're asked.";
+  if(c==="rate_limited")return "Too many AI requests right now. Wait a minute and try again.";
+  if(c==="no_ai")return AISRC===null?"The AI isn't set up. Add your API key in Home → AI settings, or open GrindTime from its claude.ai link.":e.message;
+  return (e&&e.message)||"Something went wrong. Try again."}
+async function shrink(file){try{const bmp=await createImageBitmap(file);const k=Math.min(1,1600/Math.max(bmp.width,bmp.height));
+  const c=document.createElement("canvas");c.width=Math.round(bmp.width*k);c.height=Math.round(bmp.height*k);c.getContext("2d").drawImage(bmp,0,0,c.width,c.height);
+  return await new Promise(r=>c.toBlob(b=>r(b||file),"image/jpeg",.85))}catch(e){return file}}
+function refreshAIBits(){if(cur==="study")renderStudy();if(cur==="home")renderAIBox()}
+
+/* ================= ASCEND DATA ================= */
+const FACE=[
+ {id:"skin",name:"Skin",icon:"✨",items:[["skin1","Morning wash","Gentle cleanser, lukewarm water"],["skin2","Moisturiser",""],["skin3","SPF 30+","Even when it's cloudy"],["skin4","Evening wash",""],["skin5","Didn't pick at spots","Picking causes scars"]],
+  tips:["Cleanser, moisturiser and SPF is the core routine on r/SkincareAddiction, and dermatologists recommend the same.","Wash no more than twice a day. Over-washing irritates skin (NHS).","Spots: try salicylic acid or benzoyl peroxide. A pharmacist can advise you.","Give any new product 6–8 weeks before you judge it."]},
+ {id:"eyes",name:"Eye area",icon:"👁",items:[["eye1","Slept 8+ hours","The best-proven fix for dark circles"],["eye2","Screens off 30 min before bed",""],["eye3","Didn't rub eyes",""],["eye4","Drank water through the day",""]],
+  tips:["In Karolinska Institute studies, sleep-restricted people looked more tired, paler and less attractive in photos.","A cold flannel in the morning brings puffiness down for a while.","SPF and sunglasses protect the thin skin around your eyes.","!Skip 'hunter eyes' exercises. There's no evidence they change your eye shape."]},
+ {id:"nose",name:"Nose",icon:"👃",items:[["nose1","Cleansed T-zone properly","Nose, forehead, chin"],["nose2","Didn't squeeze blackheads",""],["nose3","Exfoliant on T-zone","Salicylic acid, 2–3× a week. Tick on the days you use it"]],
+  tips:["Products and exercises can't change your nose shape. Anything that claims to is a myth.","What you can improve is the skin: blackheads and shine. Salicylic acid (BHA) clears pores better than squeezing or pore strips.","If your nose is often blocked, see a pharmacist. Breathing through your mouth all the time dries out your lips and skin."]},
+ {id:"mouth",name:"Teeth & lips",icon:"😁",items:[["m1","Brushed teeth (AM)","2 minutes, fluoride toothpaste"],["m2","Brushed + flossed (PM)",""],["m3","Lip balm",""]],
+  tips:["A clean, bright smile and fresh breath are among the things people notice most.","!Avoid DIY whitening like charcoal or lemon. They can wear down enamel. Ask a dentist instead.","See the dentist for regular check-ups."]},
+ {id:"hair",name:"Hair",icon:"💇",items:[["h1","Styled / tidied hair",""],["h2","Washed or rinsed as needed","Many people wash every 2–3 days"]],
+  tips:["A haircut that suits your face shape is the most common 'instant' upgrade. Go back every 3–5 weeks.","Use conditioner. Product should match your hair type: matte for thick hair, light for fine hair.","!Worried about hair loss? See a GP. Don't buy hair-loss drugs online."]},
+ {id:"brows",name:"Brows",icon:"〰️",items:[["b1","Brushed brows into place",""]],
+  tips:["Keep them natural and only remove strays from between and under the brows.","If you're unsure, have them threaded once by a pro, then keep that shape.","Log tidy-ups in the Upkeep tab."]},
+ {id:"jaw",name:"Jaw & neck",icon:"🗿",items:[["j1","Posture check","Chin level, shoulders back"],["j2","Moisturised neck too",""],["j3","Shaved / trimmed (if needed)",""]],
+  tips:["Jawline definition mostly comes from genetics, puberty and overall fitness, not tongue tricks.","Good posture without your head poking forward makes your jaw and neck look sharper straight away.","!Dentists warn that heavy use of jaw trainers or chewing gadgets can strain your jaw joint."]}
+];
+const BODY=[
+ {id:"chest",name:"Chest",target:10,ex:[["pushup","Push-ups","Body straight, chest to fist height"],["bench","Bench press","Feet planted, bar to mid-chest"],["incdb","Incline dumbbell press","Bench at ~30°"]]},
+ {id:"shoulders",name:"Shoulders",target:8,ex:[["ohp","Overhead press","Squeeze glutes, press straight up"],["latraise","Lateral raise","Light weight, slow, elbows soft"],["pike","Pike push-up","Bodyweight option"]]},
+ {id:"arms",name:"Arms",target:8,ex:[["curl","Bicep curl","Elbows pinned, no swinging"],["dips","Bench dips","Shoulders down, elbows back"],["chin","Chin-ups","Palms facing you"],["pushdown","Tricep pushdown","Cable or band"]]},
+ {id:"core",name:"Core",target:6,ex:[["plank","Plank","Log seconds as reps",1],["deadbug","Dead bug","Lower back stays flat"],["kneeraise","Hanging knee raise","No swinging"]]},
+ {id:"back",name:"Back",target:10,ex:[["pullup","Pull-ups","Use a band or machine if needed"],["row","Dumbbell row","Pull elbow to hip"],["lat","Lat pulldown","Chest up, bar to collarbone"],["invrow","Inverted row","Under a bar or table"]]},
+ {id:"legs",name:"Legs & glutes",target:10,ex:[["squat","Squat","Knees track toes, hips below knees"],["rdl","Romanian deadlift","Hinge at hips, flat back"],["lunge","Lunges","Long step, upright torso"],["bridge","Glute bridge","Squeeze at the top"],["calf","Calf raise","Full stretch at bottom"]]}
+];
+const BODY_TIPS=["Progressive overload means adding a rep or a little weight over time. It's what builds muscle.","Aim for roughly 10 hard sets per muscle per week. That's what fills the figure.","Learn form with light weight first. Ask gym staff for an induction.","Muscle grows on rest days and while you sleep, not just in the gym.","!Never use steroids, SARMs or anything 'from a mate'. Doctors call DIY drug stacks the most dangerous looksmaxxing trend."];
+const EX={};BODY.forEach(b=>b.ex.forEach(e=>EX[e[0]]={id:e[0],name:e[1],cue:e[2],secs:!!e[3],m:b.id}));
+const PERIODIC=[{id:"p1",t:"Haircut",days:28},{id:"p2",t:"Tidy eyebrows",days:14,s:"Strays only"},{id:"p3",t:"Trim nails",days:7},{id:"p4",t:"Change pillowcase",days:7,s:"Helps skin"},{id:"p5",t:"Wash towels",days:7},{id:"p6",t:"New toothbrush head",days:90},{id:"p7",t:"Dentist check-up",days:180}];
+
+function itemsOf(r){const hid=S.hidden[r.id]||[];return r.items.filter(i=>!hid.includes(i[0])).map(i=>({id:i[0],t:i[1],s:i[2]})).concat((S.custom[r.id]||[]).map(c=>({id:c.id,t:c.t,s:"",custom:1})))}
+function regionPct(r,k){const it=itemsOf(r);if(!it.length)return 0;const d=S.log[k||today()]||{};return it.filter(i=>d[i.id]).length/it.length}
+function facePct(k){let a=0,n=0;const d=S.log[k]||{};FACE.forEach(r=>itemsOf(r).forEach(i=>{n++;if(d[i.id])a++}));return n?a/n:0}
+function streak(){let n=0,d=new Date();if(facePct(dk(d))<.7)d.setDate(d.getDate()-1);while(facePct(dk(d))>=.7){n++;d.setDate(d.getDate()-1)}return n}
+function weekSets(){const cut=Date.now()-7*864e5;const m={};BODY.forEach(b=>m[b.id]=0);S.gym.forEach(s=>{if(s.ts>=cut&&EX[s.ex])m[EX[s.ex].m]++});return m}
+function mix(p){const a=[38,38,43],b=[255,45,69];p=Math.max(0,Math.min(1,p));return "rgb("+a.map((v,i)=>Math.round(v+(b[i]-v)*p)).join(",")+")"}
+
+const FACE_SVG=`<svg viewBox="0 0 300 380" role="img" aria-label="Face – tap a feature">
+ <g class="rg" data-r="jaw" tabindex="0" role="button" aria-label="Jaw and neck"><path d="M118 285 L118 350 Q150 366 182 350 L182 285 Z"/><path d="M64 222 Q150 345 236 222 Q150 312 64 222 Z"/></g>
+ <g class="rg" data-r="skin" tabindex="0" role="button" aria-label="Skin"><ellipse cx="56" cy="190" rx="14" ry="26"/><ellipse cx="244" cy="190" rx="14" ry="26"/><path d="M150 62 C210 62 246 110 246 182 C246 236 218 290 150 300 C82 290 54 236 54 182 C54 110 90 62 150 62 Z"/></g>
+ <g class="rg" data-r="hair" tabindex="0" role="button" aria-label="Hair"><path d="M50 178 C40 80 100 34 156 36 C214 38 262 82 250 178 C244 132 226 108 200 98 C170 112 120 112 86 102 C66 116 54 140 50 178 Z"/></g>
+ <g class="rg" data-r="brows" tabindex="0" role="button" aria-label="Brows"><path d="M86 146 Q110 132 136 140 L134 151 Q110 145 88 156 Z"/><path d="M214 146 Q190 132 164 140 L166 151 Q190 145 212 156 Z"/></g>
+ <g class="rg" data-r="eyes" tabindex="0" role="button" aria-label="Eye area"><path d="M86 176 Q112 154 138 176 Q112 200 86 176 Z"/><path d="M162 176 Q188 154 214 176 Q188 200 162 176 Z"/></g>
+ <circle class="deco" cx="112" cy="176" r="7" style="fill:#0e0f12"/><circle class="deco" cx="188" cy="176" r="7" style="fill:#0e0f12"/>
+ <g class="rg" data-r="nose" tabindex="0" role="button" aria-label="Nose"><path d="M150 168 C146 190 134 210 132 224 Q150 238 168 224 C166 210 154 190 150 168 Z"/></g>
+ <g class="rg" data-r="mouth" tabindex="0" role="button" aria-label="Teeth and lips"><path d="M116 254 Q133 246 150 250 Q167 246 184 254 Q150 286 116 254 Z"/></g></svg>`;
+const ARMS=`<g class="rg" data-r="arms" tabindex="0" role="button" aria-label="Arms"><rect x="48" y="110" width="24" height="62" rx="12" transform="rotate(8 60 141)"/><rect x="38" y="176" width="21" height="62" rx="10" transform="rotate(6 48 207)"/><rect x="168" y="110" width="24" height="62" rx="12" transform="rotate(-8 180 141)"/><rect x="181" y="176" width="21" height="62" rx="10" transform="rotate(-6 192 207)"/></g>`;
+const HEAD=`<g class="rg" data-r="face" tabindex="0" role="button" aria-label="Face – opens Ascend"><circle cx="120" cy="40" r="27"/></g><rect class="deco" x="108" y="64" width="24" height="18" rx="6"/><g class="rg" data-r="shoulders" tabindex="0" role="button" aria-label="Shoulders"><ellipse cx="76" cy="96" rx="22" ry="17"/><ellipse cx="164" cy="96" rx="22" ry="17"/></g>`;
+const BODY_FRONT=`<svg class="bodyfig" viewBox="0 0 240 440" role="img" aria-label="Body front">${HEAD}
+ <g class="rg" data-r="chest" tabindex="0" role="button" aria-label="Chest"><rect x="84" y="84" width="35" height="44" rx="13"/><rect x="121" y="84" width="35" height="44" rx="13"/></g>${ARMS}
+ <g class="rg" data-r="core" tabindex="0" role="button" aria-label="Core"><rect x="89" y="131" width="62" height="74" rx="14"/></g><rect class="deco" x="88" y="207" width="64" height="26" rx="11"/>
+ <g class="rg" data-r="legs" tabindex="0" role="button" aria-label="Legs and glutes"><rect x="88" y="226" width="31" height="98" rx="15"/><rect x="121" y="226" width="31" height="98" rx="15"/><rect x="91" y="328" width="26" height="86" rx="12"/><rect x="123" y="328" width="26" height="86" rx="12"/></g></svg>`;
+const BODY_BACK=`<svg class="bodyfig" viewBox="0 0 240 440" role="img" aria-label="Body back">${HEAD}
+ <g class="rg" data-r="back" tabindex="0" role="button" aria-label="Back"><path d="M86 84 L154 84 Q160 84 158 96 L150 196 Q120 208 90 196 L82 96 Q80 84 86 84 Z"/></g>${ARMS}
+ <g class="rg" data-r="legs" tabindex="0" role="button" aria-label="Legs and glutes"><ellipse cx="104" cy="222" rx="18" ry="20"/><ellipse cx="136" cy="222" rx="18" ry="20"/><rect x="88" y="240" width="31" height="84" rx="15"/><rect x="121" y="240" width="31" height="84" rx="15"/><rect x="91" y="328" width="26" height="86" rx="12"/><rect x="123" y="328" width="26" height="86" rx="12"/></g></svg>`;
+
+/* ================= NAV ================= */
+const VIEWS=["home","ascend","gym","study"];let cur="home";const sub={ascend:"face",gym:"body"};
+function show(v){if(!VIEWS.includes(v))v="home";cur=v;
+  VIEWS.forEach(x=>$("v-"+x).classList.toggle("on",x===v));
+  document.querySelectorAll("nav.tabs button").forEach(b=>b.classList.toggle("on",b.dataset.v===v));
+  render();window.scrollTo(0,0)}
+function go(v){if(location.hash!=="#"+v)location.hash=v;else show(v)}
+function setSub(sec,s){sub[sec]=s;document.querySelectorAll(`[data-seg=${sec}] button`).forEach(b=>b.classList.toggle("on",b.dataset.s===s));
+  document.querySelectorAll(`#v-${sec} .sv`).forEach(el=>el.classList.toggle("on",el.id===sec+"-"+s));render()}
+document.querySelectorAll("[data-seg]").forEach(sg=>sg.addEventListener("click",e=>{const b=e.target.closest("button");if(b)setSub(sg.dataset.seg,b.dataset.s)}));
+document.querySelector("nav.tabs").addEventListener("click",e=>{const b=e.target.closest("button");if(b)go(b.dataset.v)});
+$("v-home").addEventListener("click",e=>{const b=e.target.closest("[data-go]");if(b)go(b.dataset.go)});
+window.addEventListener("hashchange",()=>show(location.hash.slice(1)));
+function render(){
+  if(cur==="home")renderHome();
+  if(cur==="ascend"){$("streakN").textContent=streak();({face:renderFace,upkeep:renderPeriodic,guide:renderGuide})[sub.ascend]()}
+  if(cur==="gym"){$("wkSets").textContent=Object.values(weekSets()).reduce((a,b)=>a+b,0);({body:renderBody,log:()=>{syncRepsLabel();renderGym()},food:renderFood})[sub.gym]()}
+  if(cur==="study")renderStudy();
+}
+
+/* ================= HOME ================= */
+function renderHome(){const h=new Date().getHours();
+  $("greet").textContent=h<12?"Good morning":h<18?"Good afternoon":"Good evening";
+  $("homeDate").textContent=new Date().toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"});
+  $("hAscP").textContent=Math.round(facePct(today())*100)+"%";$("hAscS").textContent=streak();
+  $("hGymS").textContent=Object.values(weekSets()).reduce((a,b)=>a+b,0);$("hGymK").textContent=Math.round(foodTot().k);
+  $("hStuQ").textContent=Object.values(S.study.p).reduce((a,p)=>a+p.n,0);$("hStuM").textContent=Object.keys(TOPIC).filter(id=>mast(id)>0).length;
+  const last=S.study.att[S.study.att.length-1];
+  $("hCont").textContent=last&&TOPIC[last.t]?"→ Continue: "+TOPIC[last.t].code+" "+TOPIC[last.t].name:"→ Pick a topic to start levelling up";
+  renderPlan();renderExams();renderAIBox();renderNotifBox();
+}
+/* ---- AI settings (standalone / APK build) ---- */
+function renderAIBox(){const box=$("aiBox");if(!box)return;if(AISRC==="claude"){box.hidden=true;return}box.hidden=false;
+  const k=getKey();$("aiState").textContent=k?"✓ On":"Off";
+  $("aiPad").innerHTML=k?`<div style="font-size:13.5px">Using your Anthropic API key <code style="color:var(--mute)">…${esc(k.slice(-4))}</code></div>
+     <label class="f" style="margin-top:10px" for="aiModel">Model</label><select id="aiModel"><option value="claude-sonnet-5-5">Claude Sonnet 5.5 (recommended)</option><option value="claude-haiku-5-5">Claude Haiku 5.5 (cheaper, less accurate)</option><option value="claude-opus-5-5">Claude Opus 5.5 (best, most expensive)</option></select>
+     <div class="row2" style="margin-top:10px"><button class="btn" id="aiTest">Test it</button><button class="btn" id="aiRemove" style="color:var(--warn)">Remove key</button></div><div id="aiMsg" style="font-size:13px;margin-top:8px"></div>`
+   :`<div style="font-size:13px;color:var(--mute)">Outside claude.ai, photo marking, new questions, key terms and food photos need an <b>Anthropic API key</b>. Get one at console.anthropic.com → API keys. API use is pay-as-you-go, roughly a few pence per marked answer or batch of questions. Add a small amount of credit and set a monthly spend limit in the console so it can't run away. The key stays on this phone only and isn't included in backups.</div>
+     <input id="aiKeyIn" type="password" placeholder="sk-ant-…" autocomplete="off" style="margin-top:10px"><button class="btn pri wide" id="aiSave" style="margin-top:8px">Save key</button>`;
+  const m=$("aiModel");if(m){m.value=getModel();m.onchange=()=>{try{localStorage.setItem(MKEY,m.value)}catch(e){}toast("Model saved")}}
+  const sv=$("aiSave");if(sv)sv.onclick=()=>{const v=$("aiKeyIn").value.trim();if(!/^sk-ant-/.test(v)){toast("That doesn't look like an Anthropic key (sk-ant-…)");return}setKey(v);renderAIBox();toast("Key saved 🤖")};
+  const rm=$("aiRemove");if(rm)rm.onclick=()=>{setKey("");renderAIBox();toast("Key removed")};
+  const ts=$("aiTest");if(ts)ts.onclick=async()=>{$("aiMsg").innerHTML=`<span class="spin"></span> Testing…`;try{const r=await ask('Reply with ONLY this JSON: {"ok":true}',null,"quick");$("aiMsg").innerHTML=r&&r.ok?`<span style="color:var(--good)">✓ Working</span>`:"Got a reply, but not the expected one."}catch(e){$("aiMsg").innerHTML=`<span style="color:var(--warn)">${esc(aiErr(e))}</span>`}};
+}
+/* ---- today's plan ---- */
+function renderPlan(){const due=dueList().length,fp=facePct(today()),setsT=S.gym.filter(s=>s.d===today()).length,fm=focusMin(today()),qT=S.study.att.filter(a=>dk(a.ts)===today()&&!a.x).length;
+  const items=[
+   {ok:fp>=.7,ic:"✨",t:"Face routine",s:Math.round(fp*100)+"% done",go:"ascend"},
+   {ok:setsT>0,ic:"🏋️",t:"Train or move",s:setsT?setsT+" sets logged today":"No sets yet (rest days count too)",go:"gym"},
+   {ok:qT>=10,ic:"✎",t:"10 fresh study questions",s:qT+"/10 today",go:"study"},
+   {ok:due===0,ic:"🔁",t:"Clear due mistakes",s:due?due+" due now":"All clear",go:"study"},
+   {ok:fm>=50,ic:"⏱",t:"50 min focused study",s:fm+" min today",go:"study"}];
+  const n=items.filter(i=>i.ok).length;$("planPct").textContent=n+"/"+items.length;
+  $("planList").innerHTML=items.map(i=>`<button class="plan ${i.ok?"ok":""}" data-go="${i.go}"><span class="dot">${i.ok?"✓":i.ic}</span><span class="t">${esc(i.t)}<small>${esc(i.s)}</small></span></button>`).join("")}
+/* ---- exams ---- */
+S.exams=S.exams||[];
+function daysTo(d){const a=new Date(today()+"T00:00"),b=new Date(d+"T00:00");return Math.round((b-a)/DAY)}
+function renderExams(){const L=S.exams.slice().sort((a,b)=>a.d.localeCompare(b.d));
+  $("examList").innerHTML=L.length?L.map(e=>{const n=daysTo(e.d);return `<div class="exam" style="${n<0?"opacity:.45":""}"><div class="d" style="color:${n<0?"var(--mute)":n<=7?"var(--warn)":n<=21?"var(--amber)":"var(--good)"}">${n<0?"✓":n===0?"!":n}<small>${n<0?"done":n===0?"today":n===1?"day":"days"}</small></div><div class="t">${esc(e.n)}<small>${new Date(e.d+"T12:00").toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short",year:"numeric"})}</small></div><button class="rm" data-exdel="${e.id}">Remove</button></div>`}).join("")
+   :`<div class="exam"><div class="t"><small>Add your tests and exams to see a countdown.</small></div></div>`}
+$("examForm").addEventListener("submit",e=>{e.preventDefault();const i=e.target.querySelectorAll("input");const n=i[0].value.trim(),d=i[1].value;if(!n||!d)return;
+  S.exams.push({id:"e"+Date.now().toString(36),n,d});save();e.target.reset();renderExams();toast("Added 📅")});
+$("examList").addEventListener("click",e=>{const b=e.target.closest("[data-exdel]");if(!b)return;S.exams=S.exams.filter(x=>x.id!==b.dataset.exdel);save();renderExams()});
+/* ---- backup ---- */
+$("bkCopy").addEventListener("click",async()=>{const txt="GRINDTIME1:"+JSON.stringify(S);
+  try{await navigator.clipboard.writeText(txt);toast("Backup copied – paste it into your Notes app")}catch(e){$("bkRestore").hidden=false;$("bkText").value=txt;$("bkText").select();toast("Copy the text in the box")}});
+$("bkShow").addEventListener("click",()=>{$("bkRestore").hidden=!$("bkRestore").hidden});
+$("bkGo").addEventListener("click",()=>{const raw=$("bkText").value.trim().replace(/^GRINDTIME1:/,"");
+  try{const o=JSON.parse(raw);if(!o||typeof o!=="object"||!o.study)throw 0;localStorage.setItem(KEY,JSON.stringify(o));toast("Restored ✓");setTimeout(()=>location.reload(),600)}catch(e){toast("That doesn't look like a GrindTime backup")}});
+
+/* ================= ASCEND ================= */
+function renderFace(){
+  $("dateLbl").textContent=new Date().toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"});
+  const fig=$("faceFig");if(!fig.firstChild)fig.innerHTML=FACE_SVG;
+  fig.querySelectorAll(".rg").forEach(g=>{const r=FACE.find(x=>x.id===g.dataset.r);g.style.fill=mix(regionPct(r))});
+  $("faceBig").textContent=Math.round(facePct(today())*100)+"%";
+  let h="";for(let i=13;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const q=facePct(dk(d));h+=`<span class="${q>=1?"l3":q>=.7?"l2":q>0?"l1":""}"></span>`}$("days").innerHTML=h;
+  const d=S.log[today()]||{};
+  $("faceChips").innerHTML=FACE.map(r=>{const it=itemsOf(r);return `<button class="rchip" data-r="${r.id}"><b>${r.icon} ${esc(r.name)}</b><small>${it.filter(i=>d[i.id]).length}/${it.length} today</small><span class="bar" style="width:${regionPct(r)*100}%"></span></button>`}).join("");
+}
+let back=false;
+function renderBody(){const ws=weekSets();
+  $("bodyFig").innerHTML=back?BODY_BACK:BODY_FRONT;$("flip").textContent=back?"↻ Show front":"↻ Show back";
+  $("bodyFig").querySelectorAll(".rg").forEach(g=>{const id=g.dataset.r;const b=BODY.find(x=>x.id===id);g.style.fill=id==="face"?mix(facePct(today())):mix(Math.min(1,ws[id]/b.target))});
+  $("bodyBig").textContent=Math.round(BODY.reduce((a,b)=>a+Math.min(1,ws[b.id]/b.target),0)/BODY.length*100)+"%";
+  $("bodyChips").innerHTML=BODY.map(b=>`<button class="rchip" data-r="${b.id}"><b>${esc(b.name)}</b><small>${ws[b.id]}/${b.target} sets</small><span class="bar" style="width:${Math.min(1,ws[b.id]/b.target)*100}%"></span></button>`).join("");
+}
+$("flip").addEventListener("click",()=>{back=!back;renderBody()});
+function onRegion(e){const g=e.target.closest(".rg,.rchip");if(!g)return;const id=g.dataset.r;if(id==="face"){go("ascend");setSub("ascend","face");return}openRegion(id)}
+["faceFig","faceChips","bodyFig","bodyChips"].forEach(id=>{$(id).addEventListener("click",onRegion);$(id).addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();onRegion(e)}})});
+
+let openId=null,editing=false;
+function tipHtml(arr){return `<div class="tipl">`+arr.map(t=>t[0]==="!"?`<p class="no">${esc(t.slice(1))}</p>`:`<p>${esc(t)}</p>`).join("")+`</div>`}
+function openRegion(id){openId=id;editing=false;renderSheet();$("sheet").classList.add("on");$("scrim").classList.add("on");document.body.classList.add("lock")}
+function closeSheet(){openId=null;$("sheet").classList.remove("on");$("scrim").classList.remove("on");document.body.classList.remove("lock");render()}
+$("scrim").addEventListener("click",closeSheet);
+function renderSheet(){const el=$("sheetIn");const f=FACE.find(r=>r.id===openId);
+  if(f){const it=itemsOf(f),d=S.log[today()]||{};const n=it.filter(i=>d[i.id]).length;
+    el.innerHTML=`<div class="grab"></div><div class="sh-head"><div><h2>${f.icon} ${esc(f.name)}</h2><small>${n}/${it.length} done today</small></div><button class="x" data-a="close" aria-label="Close">×</button></div>
+     <div class="sub"><span>Today's checklist</span><button data-a="edit">${editing?"Done":"Edit"}</button></div>`+
+     it.map(i=>`<div class="item ${d[i.id]?"done":""}" data-i="${i.id}"><div class="check"></div><div class="t"><span>${esc(i.t)}</span>${i.s?`<small>${esc(i.s)}</small>`:""}</div>${editing?`<button class="rm" data-rm="${i.id}">Remove</button>`:""}</div>`).join("")+
+     (editing?`<form class="add" id="addF"><input placeholder="Add your own step…" maxlength="60"><button class="btn pri sm">Add</button></form><div style="padding:0 18px"><button class="btn sm" data-a="restore">Restore defaults</button></div>`:"")+
+     `<div class="sub"><span>How to improve it</span></div>`+tipHtml(f.tips);
+  }else{const b=BODY.find(x=>x.id===openId);if(!b)return;const ws=weekSets();const p=Math.min(1,ws[b.id]/b.target);
+    el.innerHTML=`<div class="grab"></div><div class="sh-head"><div><h2>${esc(b.name)}</h2><small>Last 7 days</small></div><button class="x" data-a="close" aria-label="Close">×</button></div>
+     <div class="wk"><div class="row1"><span>${ws[b.id]} of ${b.target} sets</span><span>${Math.round(p*100)}%</span></div><div class="track"><i style="width:${p*100}%"></i></div></div>
+     <div class="sub"><span>Exercises</span></div>`+b.ex.map(e=>`<div class="ex"><div class="t"><span>${esc(e[1])}</span><small>${esc(e[2])}</small></div><button class="btn sm pri" data-log="${e[0]}">+ Log set</button></div>`).join("")+
+     `<div class="sub"><span>Training tips</span></div>`+tipHtml(BODY_TIPS);}
+}
+$("sheetIn").addEventListener("click",e=>{
+  const a=e.target.closest("[data-a]");
+  if(a){const act=a.dataset.a;if(act==="close")return closeSheet();if(act==="edit"){editing=!editing;return renderSheet()}if(act==="restore"){delete S.hidden[openId];save();return renderSheet()}}
+  const rm=e.target.closest("[data-rm]");
+  if(rm){e.stopPropagation();const id=rm.dataset.rm;const c=S.custom[openId]||[];if(c.some(x=>x.id===id))S.custom[openId]=c.filter(x=>x.id!==id);else(S.hidden[openId]=S.hidden[openId]||[]).push(id);save();return renderSheet()}
+  const lg=e.target.closest("[data-log]");
+  if(lg){const ex=lg.dataset.log;closeSheet();setSub("gym","log");$("exSel").value=ex;syncRepsLabel();$("rIn").focus();return}
+  const it=e.target.closest(".item");
+  if(it&&!editing){const k=today();S.log[k]=S.log[k]||{};S.log[k][it.dataset.i]=!S.log[k][it.dataset.i];save();renderSheet();
+    const f=FACE.find(r=>r.id===openId);if(f&&regionPct(f)>=1&&S.log[k][it.dataset.i])toast(f.name+" is fully green 💚");
+    if(facePct(k)>=1&&S.log[k][it.dataset.i])toast("Whole face green today ✨")}
+});
+$("sheetIn").addEventListener("submit",e=>{e.preventDefault();const inp=e.target.querySelector("input");const t=inp.value.trim();if(!t)return;(S.custom[openId]=S.custom[openId]||[]).push({id:"c"+Date.now().toString(36),t});save();renderSheet()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&openId)closeSheet()});
+
+function renderPeriodic(){const now=Date.now();
+  $("periodic").innerHTML=PERIODIC.map(p=>{const last=S.per[p.id];let tag;if(!last)tag=`<span class="tag">Not logged</span>`;else{const left=Math.ceil(p.days-(now-last)/864e5);tag=left<=0?`<span class="tag due">Due${left<0?` (${-left}d over)`:""}</span>`:`<span class="tag ok">${left}d left</span>`}
+    return `<div class="item" data-id="${p.id}"><div class="t"><span>${esc(p.t)}</span><small>${p.s?esc(p.s)+" · ":""}every ${p.days} days${last?" · last "+new Date(last).toLocaleDateString("en-GB",{day:"numeric",month:"short"}):""}</small></div>${tag}</div>`}).join("")}
+$("periodic").addEventListener("click",e=>{const el=e.target.closest(".item");if(!el)return;S.per[el.dataset.id]=Date.now();save();renderPeriodic();toast("Logged ✓")});
+
+const TIPS=[
+ {c:"Skin",ev:"s",t:"Keep it to 3 steps",p:"Cleanser, moisturiser, sunscreen. It's the baseline that r/SkincareAddiction and dermatologists both recommend.",src:"r/SkincareAddiction wiki · dermatologists"},
+ {c:"Skin",ev:"s",t:"Wash twice a day, no more",p:"Washing more often irritates skin and can make spots worse. Use lukewarm water.",src:"NHS"},
+ {c:"Skin",ev:"s",t:"Daily SPF 30+",p:"It protects against UV damage and stops spot marks from darkening. Wear it on cloudy days too.",src:"r/SkincareAddiction · UPMC"},
+ {c:"Skin",ev:"s",t:"Spots? Salicylic acid or benzoyl peroxide",p:"Both are proven over-the-counter acne treatments. A pharmacist can recommend one.",src:"NHS"},
+ {c:"Skin",ev:"s",t:"Don't pick or squeeze",p:"Picking is how a spot that lasts a week turns into a scar that lasts years.",src:"Self Care Forum (UK)"},
+ {c:"Grooming",ev:"s",t:"A haircut that fits your face",p:"Most guides rank this as the biggest quick win. Ask your barber what suits your face shape and hair type.",src:"FashionBeans"},
+ {c:"Grooming",ev:"s",t:"The free basics",p:"Clean nails, clothes without creases, a neat beard or a clean shave. They're what people actually notice.",src:"FashionBeans"},
+ {c:"Body",ev:"s",t:"Sleep is the real glow up",p:"In Karolinska Institute studies, people were rated less attractive and less healthy after short sleep.",src:"BMJ 2010 · Royal Society Open Science 2017"},
+ {c:"Body",ev:"s",t:"Train for strength and posture",p:"Resistance training improves posture, mood and how your clothes fit.",src:"Softmaxxing guides"},
+ {c:"Avoid",ev:"x",bad:1,t:"Bone smashing",p:"There's zero clinical evidence it works. It risks bones healing crooked, nerve damage, disfigurement and vision loss.",src:"Men's Health · UNILAD"},
+ {c:"Avoid",ev:"x",bad:1,t:"DIY drug or steroid stacks",p:"Doctors call this the most dangerous looksmaxxing trend. Never take drugs or hormones without a doctor.",src:"UNILAD / doctor interviews"},
+ {c:"Avoid",ev:"x",bad:1,t:"Toothpaste, harsh scrubs, sunbeds",p:"Toothpaste on spots, aggressive scrubs and sunbeds for acne all irritate or damage skin.",src:"NHS"},
+ {c:"Avoid",ev:"m",bad:1,t:"Mewing: don't expect miracles",p:"Harmless, but there's little evidence it reshapes your jaw. Most forum jawlines come from puberty, weight changes or camera angles.",src:"UNILAD · orthodontists"},
+ {c:"Avoid",ev:"m",bad:1,t:"Face-rating apps and forums",p:"Rating culture can hurt self-esteem. If your skin or looks are getting you down, a GP or pharmacist can actually help.",src:"Internet Matters · NHS"}
+];
+const CATS=["All","Skin","Grooming","Body","Avoid"];let cat="All";const EVL={s:"Strong evidence",m:"Good sense",x:"Harmful"};
+function renderGuide(){$("cats").innerHTML=CATS.map(c=>`<button class="chip ${c===cat?"on":""}" data-c="${c}">${c==="Avoid"?"🚫 Avoid":c}</button>`).join("");
+  $("tips").innerHTML=TIPS.filter(t=>cat==="All"||t.c===cat).map(t=>`<div class="tip ${t.bad?"bad":""}"><h3><span>${esc(t.t)}</span><span class="ev ${t.ev}">${t.bad&&t.ev==="m"?"Overhyped":EVL[t.ev]}</span></h3><p>${esc(t.p)}</p><div class="src">${esc(t.src)}</div></div>`).join("")}
+$("cats").addEventListener("click",e=>{const b=e.target.closest(".chip");if(!b)return;cat=b.dataset.c;renderGuide()});
+
+/* ================= GYM ================= */
+$("exSel").innerHTML=BODY.map(b=>`<optgroup label="${esc(b.name)}">`+b.ex.map(e=>`<option value="${e[0]}">${esc(e[1])}</option>`).join("")+`</optgroup>`).join("");
+function syncRepsLabel(){$("rLbl").textContent=EX[$("exSel").value].secs?"Seconds":"Reps"}
+$("exSel").addEventListener("change",syncRepsLabel);
+$("logger").addEventListener("submit",e=>{e.preventDefault();const r=parseInt($("rIn").value);if(!(r>0))return;const w=parseFloat($("wIn").value);
+  S.gym.push({d:today(),ex:$("exSel").value,w:w>0?w:0,r,ts:Date.now()});save();render();toast("Set logged 💪")});
+const fmt=s=>(s.w?s.w+" kg × ":"")+s.r+(EX[s.ex]&&EX[s.ex].secs?" s":" reps");
+function renderGym(){const ws=weekSets();
+  const td=S.gym.map((s,i)=>Object.assign({},s,{i})).filter(s=>s.d===today());
+  $("todayCount").textContent=td.length?td.length+" sets":"";
+  $("todaySets").innerHTML=td.length?td.slice().reverse().map(s=>`<div class="set"><div class="t">${esc(EX[s.ex]?EX[s.ex].name:s.ex)} <small>· ${fmt(s)}</small></div><button class="rm" data-del="${s.i}">Delete</button></div>`).join(""):`<div class="set"><div class="t"><small>No sets yet today.</small></div></div>`;
+  $("mbars").innerHTML=BODY.map(b=>{const p=Math.min(1,ws[b.id]/b.target);return `<div class="mbar"><span>${esc(b.name.split(" ")[0])}</span><div class="track" style="margin:0"><i style="width:${p*100}%"></i></div><span>${ws[b.id]}/${b.target}</span></div>`}).join("");
+  const by={};S.gym.forEach(s=>{if(s.d!==today())(by[s.d]=by[s.d]||[]).push(s)});const ds=Object.keys(by).sort().reverse().slice(0,10);
+  $("hist").innerHTML=ds.length?ds.map(d=>{const c={};by[d].forEach(s=>c[s.ex]=(c[s.ex]||0)+1);return `<div class="set"><div class="t">${new Date(d+"T12:00").toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"})}<br><small>${Object.entries(c).map(([k,v])=>esc(EX[k]?EX[k].name:k)+" ×"+v).join(" · ")}</small></div></div>`}).join(""):`<div class="set"><div class="t"><small>Past sessions will show here.</small></div></div>`}
+$("todaySets").addEventListener("click",e=>{const b=e.target.closest("[data-del]");if(!b)return;S.gym.splice(+b.dataset.del,1);save();render()});
+
+/* ---- food ---- */
+function foodTot(){const l=S.food[today()]||[];return l.reduce((a,f)=>({k:a.k+(+f.k||0),p:a.p+(+f.p||0)}),{k:0,p:0})}
+let foodPending=null;
+function renderFood(){const t=foodTot();$("kTot").textContent=Math.round(t.k);$("pTot").textContent=Math.round(t.p)+"g";
+  $("foodDate").textContent=new Date().toLocaleDateString("en-GB",{day:"numeric",month:"short"});
+  const l=S.food[today()]||[];
+  $("foodList").innerHTML=l.length?l.map((f,i)=>`<div class="set"><div class="t">${esc(f.n)}<br><small>${Math.round(f.k)} kcal${f.p?` · ${Math.round(f.p)} g protein`:""}${f.ai?" · AI estimate":""}</small></div><button class="rm" data-fdel="${i}">Delete</button></div>`).join(""):`<div class="set"><div class="t"><small>Nothing logged yet today.</small></div></div>`;
+  const box=$("foodAI");
+  if(foodPending&&foodPending.loading)box.innerHTML=`<div class="note"><span class="spin"></span> Looking at your photo…</div>`;
+  else if(foodPending&&foodPending.err)box.innerHTML=`<div class="note warn">${esc(foodPending.err)}</div>`;
+  else if(foodPending&&foodPending.items){box.innerHTML=`<section class="block" style="margin:0;background:var(--card2)"><h2><span>AI estimate</span><span>${esc(foodPending.confidence||"")}</span></h2>`+
+     foodPending.items.map((it,i)=>`<div class="set"><div class="t">${esc(it.name)}<br><small>${esc(it.portion||"")} · ${Math.round(it.kcal)} kcal · ${Math.round(it.protein_g||0)} g protein</small></div></div>`).join("")+
+     (foodPending.note?`<div class="pad" style="font-size:13px;color:var(--mute)">${esc(foodPending.note)}</div>`:"")+
+     `<div class="pad row2"><button class="btn pri" data-fadd="1">Add to today</button><button class="btn" data-fadd="0">Discard</button></div></section>`}
+  else box.innerHTML=AI?"":`<div class="note warn">Photo estimates need the AI. Add your API key in Home → AI settings. You can still add food manually.</div>`;
+}
+$("foodList").addEventListener("click",e=>{const b=e.target.closest("[data-fdel]");if(!b)return;S.food[today()].splice(+b.dataset.fdel,1);save();renderFood()});
+$("foodAI").addEventListener("click",e=>{const b=e.target.closest("[data-fadd]");if(!b)return;
+  if(b.dataset.fadd==="1"){const l=(S.food[today()]=S.food[today()]||[]);foodPending.items.forEach(it=>l.push({n:it.name,k:+it.kcal||0,p:+it.protein_g||0,ai:1,ts:Date.now()}));save();toast("Added ✓")}
+  foodPending=null;$("foodNote").value="";renderFood()});
+async function foodFromPhoto(file,isLabel){if(!file)return;await aiReady;
+  if(!AI){foodPending={err:aiErr({code:"no_ai"})};return renderFood()}
+  foodPending={loading:1};renderFood();
+  try{const img=await shrink(file);const note=$("foodNote").value.trim();
+    const prompt=`You are a nutrition assistant in a UK food-logging app. ${isLabel?"The image shows food packaging or a nutrition label. Read the energy (kcal) and protein values. Use the per-serving/per-pack figure that matches one portion unless the user's note says otherwise; scale using the note if it gives grams.":"The image shows a meal or food. Identify each item, estimate a realistic portion size and its energy and protein using standard UK values."}
+User's note about the portion: ${note?JSON.stringify(note):"(none)"}
+If the image is not food or is unreadable, return items: [] and explain in note.
+Reply with ONLY this JSON: {"items":[{"name":string,"portion":string,"kcal":number,"protein_g":number}],"confidence":"high"|"medium"|"low","note":string (one short sentence about what could make it off)}`;
+    const r=await ask(prompt,[img],"default");
+    if(!r.items||!r.items.length){foodPending={err:r.note||"Couldn't recognise food in that photo."}}else foodPending=r;
+  }catch(e){foodPending={err:aiErr(e)}}renderFood()}
+$("foodPhoto").addEventListener("change",e=>{foodFromPhoto(e.target.files[0],false);e.target.value=""});
+$("foodLabel").addEventListener("change",e=>{foodFromPhoto(e.target.files[0],true);e.target.value=""});
+$("manualFood").addEventListener("submit",e=>{e.preventDefault();const i=e.target.querySelectorAll("input");const n=i[0].value.trim(),k=parseFloat(i[1].value),p=parseFloat(i[2].value)||0;if(!n||!(k>=0))return;
+  (S.food[today()]=S.food[today()]||[]).push({n,k,p,ts:Date.now()});save();e.target.reset();renderFood();toast("Added ✓")});
+
+/* ================= STUDY DATA ================= */
+const SUBJECTS=[
+ {id:"bio",name:"Biology",board:"OCR A (H420)",icon:"🧬",mods:[
+  ["Module 2 · Foundations in biology",[["2.1.1","Cell structure"],["2.1.2","Biological molecules"],["2.1.3","Nucleotides and nucleic acids"],["2.1.4","Enzymes"],["2.1.5","Biological membranes"],["2.1.6","Cell division, cell diversity and cellular organisation"]]],
+  ["Module 3 · Exchange and transport",[["3.1.1","Exchange surfaces"],["3.1.2","Transport in animals"],["3.1.3","Transport in plants"]]],
+  ["Module 4 · Biodiversity, evolution and disease",[["4.1.1","Communicable diseases, disease prevention and the immune system"],["4.2.1","Biodiversity"],["4.2.2","Classification and evolution"]]],
+  ["Module 5 · Communication, homeostasis and energy",[["5.1.1","Communication and homeostasis"],["5.1.2","Excretion as an example of homeostatic control"],["5.1.3","Neuronal communication"],["5.1.4","Hormonal communication"],["5.1.5","Plant and animal responses"],["5.2.1","Photosynthesis"],["5.2.2","Respiration"]]],
+  ["Module 6 · Genetics, evolution and ecosystems",[["6.1.1","Cellular control"],["6.1.2","Patterns of inheritance"],["6.1.3","Manipulating genomes"],["6.2.1","Cloning and biotechnology"],["6.3.1","Ecosystems"],["6.3.2","Populations and sustainability"]]]]},
+ {id:"chem",name:"Chemistry",board:"AQA (7405)",icon:"⚗️",mods:[
+  ["3.1 · Physical chemistry",[["3.1.1","Atomic structure"],["3.1.2","Amount of substance"],["3.1.3","Bonding"],["3.1.4","Energetics"],["3.1.5","Kinetics"],["3.1.6","Chemical equilibria, Le Chatelier's principle and Kc"],["3.1.7","Oxidation, reduction and redox equations"],["3.1.8","Thermodynamics"],["3.1.9","Rate equations"],["3.1.10","Equilibrium constant Kp"],["3.1.11","Electrode potentials and electrochemical cells"],["3.1.12","Acids and bases"]]],
+  ["3.2 · Inorganic chemistry",[["3.2.1","Periodicity"],["3.2.2","Group 2, the alkaline earth metals"],["3.2.3","Group 7(17), the halogens"],["3.2.4","Properties of Period 3 elements and their oxides"],["3.2.5","Transition metals"],["3.2.6","Reactions of ions in aqueous solution"]]],
+  ["3.3 · Organic chemistry",[["3.3.1","Introduction to organic chemistry"],["3.3.2","Alkanes"],["3.3.3","Halogenoalkanes"],["3.3.4","Alkenes"],["3.3.5","Alcohols"],["3.3.6","Organic analysis"],["3.3.7","Optical isomerism"],["3.3.8","Aldehydes and ketones"],["3.3.9","Carboxylic acids and derivatives"],["3.3.10","Aromatic chemistry"],["3.3.11","Amines"],["3.3.12","Polymers"],["3.3.13","Amino acids, proteins and DNA"],["3.3.14","Organic synthesis"],["3.3.15","NMR spectroscopy"],["3.3.16","Chromatography"]]]]},
+ {id:"maths",name:"Maths",board:"Edexcel (9MA0)",icon:"∑",mods:[
+  ["Pure mathematics",[["P1","Proof"],["P2","Algebra and functions"],["P3","Coordinate geometry in the (x, y) plane"],["P4","Sequences and series"],["P5","Trigonometry"],["P6","Exponentials and logarithms"],["P7","Differentiation"],["P8","Integration"],["P9","Numerical methods"],["P10","Vectors"]]],
+  ["Statistics",[["S1","Statistical sampling"],["S2","Data presentation and interpretation"],["S3","Probability"],["S4","Statistical distributions"],["S5","Statistical hypothesis testing"]]],
+  ["Mechanics",[["M6","Quantities and units in mechanics"],["M7","Kinematics"],["M8","Forces and Newton's laws"],["M9","Moments"]]]]}
+];
+const TOPIC={};SUBJECTS.forEach(s=>s.mods.forEach(m=>m[1].forEach(t=>{TOPIC[s.id+":"+t[0]]={id:s.id+":"+t[0],code:t[0],name:t[1],subj:s,mod:m[0]}})));
+
+/* Original exam-style seed questions (levels 1–3). Higher levels are generated by the AI. */
+const SEEDS={
+ "chem:3.3.7":[
+  {l:1,m:2,q:"State what is meant by the terms chiral centre and enantiomers.",ms:["Chiral centre: a carbon atom attached to four different atoms or groups","Enantiomers: non-superimposable mirror images of each other"],a:"A chiral centre is a carbon atom bonded to four different atoms or groups.\nEnantiomers are stereoisomers that are non-superimposable mirror images of each other."},
+  {l:2,m:3,q:"Describe how you could distinguish between separate samples of the two enantiomers of butan-2-ol, and explain why a 50:50 mixture of them shows no effect.",ms:["Pass plane-polarised light through each sample","Enantiomers rotate the plane of polarised light in opposite directions (by the same angle)","A racemic mixture: equal amounts so the rotations cancel / no net rotation"],a:"Shine plane-polarised light through each sample. One enantiomer rotates the plane clockwise and the other anticlockwise, by the same angle.\nA 50:50 mixture is a racemic mixture. The equal and opposite rotations cancel, so there is no overall optical activity."},
+  {l:3,m:4,q:"2-hydroxypropanenitrile is made by reacting ethanal with KCN followed by dilute acid. Explain why the product is optically inactive even though it contains a chiral centre.",ms:["The C=O group (carbonyl) is planar / trigonal planar","The nucleophile (:CN⁻) can attack from above or below the plane","Attack from either side is equally likely","So equal amounts of each enantiomer form – a racemic mixture, whose rotations cancel"],a:"The carbonyl group in ethanal is trigonal planar. The cyanide ion nucleophile can attack the δ+ carbon from either side of the plane with equal probability. This produces equal amounts of the two enantiomers, a racemic mixture. Their effects on plane-polarised light cancel out, so the product is optically inactive."}],
+ "chem:3.3.8":[
+  {l:1,m:3,q:"Give a chemical test to distinguish between propanal and propanone. State the observation with each compound.",ms:["Tollens' reagent (or Fehling's solution), warmed","Propanal: silver mirror (or brick-red precipitate with Fehling's)","Propanone: no visible change (stays colourless / stays blue)"],a:"Warm each compound with Tollens' reagent.\nPropanal (an aldehyde) is oxidised and a silver mirror forms.\nPropanone (a ketone) is not oxidised, so there is no visible change.\n(Alternative: Fehling's solution gives a brick-red precipitate with propanal and stays blue with propanone.)"},
+  {l:2,m:5,q:"Butanone is reduced by NaBH₄ in aqueous solution. Name the mechanism and outline it, using curly arrows, on paper. Name the organic product.",ms:["Nucleophilic addition","Arrow from H⁻ (hydride ion) to the δ+ carbon of C=O","Arrow from the C=O double bond to the oxygen","Alkoxide intermediate (O⁻) with arrow from O⁻ lone pair to H of H₂O (or H⁺)","Product: butan-2-ol"],a:"Mechanism: nucleophilic addition.\n1. A hydride ion :H⁻ from NaBH₄ attacks the δ+ carbonyl carbon (arrow from H⁻ to C).\n2. The C=O π bond breaks heterolytically (arrow from the C=O bond to O), giving an alkoxide intermediate, O⁻.\n3. A lone pair on O⁻ takes H⁺ from water (arrow from the O⁻ lone pair to the H of H₂O).\nProduct: butan-2-ol, CH₃CH(OH)CH₂CH₃."},
+  {l:3,m:6,q:"Propanal reacts with KCN followed by dilute acid. Name and outline the mechanism. Explain why KCN is used instead of HCN, and why the product is formed as a racemic mixture.",ms:["Nucleophilic addition","Arrow from lone pair on C of :CN⁻ to δ+ carbonyl carbon","Arrow from C=O bond to O, giving O⁻ intermediate","Arrow from O⁻ to H⁺ (or H of HCN/H₂O); product 2-hydroxybutanenitrile","HCN is a highly toxic gas (KCN is safer to handle in solution), and KCN gives a higher concentration of CN⁻","Planar C=O attacked equally from either side, so equal amounts of the enantiomers form"],a:"Nucleophilic addition.\n:CN⁻ attacks the δ+ carbonyl carbon. The C=O π bond breaks to O, giving an alkoxide ion. The O⁻ is then protonated by H⁺ from the acid, giving 2-hydroxybutanenitrile.\nKCN is used because HCN is a very toxic gas. KCN in solution is easier to handle and provides more CN⁻ nucleophile.\nThe C=O group is trigonal planar, so CN⁻ attacks from either side with equal probability. Equal amounts of the two enantiomers form, giving a racemic mixture."}],
+ "chem:3.3.9":[
+  {l:1,m:2,q:"Write an equation for the reaction of ethanoic acid with sodium carbonate. State what you would observe.",ms:["2CH₃COOH + Na₂CO₃ → 2CH₃COONa + CO₂ + H₂O (balanced)","Effervescence / fizzing (of CO₂)"],a:"2CH₃COOH + Na₂CO₃ → 2CH₃COONa + CO₂ + H₂O\nObservation: effervescence (fizzing) as carbon dioxide is given off."},
+  {l:2,m:3,q:"Aspirin is made industrially using ethanoic anhydride rather than ethanoyl chloride. Give three reasons why.",ms:["Ethanoic anhydride is cheaper","Less corrosive / reaction is less violent / easier to control","Does not produce corrosive/toxic HCl gas (by-product is ethanoic acid)","Reacts less readily with water (less easily hydrolysed)"],a:"Any three:\n• Ethanoic anhydride is cheaper.\n• It is less corrosive and reacts less vigorously, so the reaction is easier to control.\n• It doesn't release toxic, corrosive HCl fumes. The by-product is ethanoic acid.\n• It is hydrolysed by moisture less readily."},
+  {l:3,m:5,q:"Name and outline the mechanism for the reaction of ethanoyl chloride with methylamine. Name the organic product.",ms:["Nucleophilic addition–elimination","Arrow from lone pair on N of CH₃NH₂ to δ+ carbonyl C; arrow from C=O to O","Arrow from O⁻ lone pair reforming C=O, and arrow from C–Cl bond to Cl (Cl⁻ leaves)","Arrow showing loss of H⁺ from N⁺ (e.g. removed by Cl⁻ or a second CH₃NH₂)","Product: N-methylethanamide"],a:"Nucleophilic addition–elimination.\nAddition: the lone pair on the nitrogen of CH₃NH₂ attacks the δ+ carbonyl carbon, and the C=O π electrons move onto O, giving a tetrahedral intermediate.\nElimination: the O⁻ lone pair reforms C=O and the C–Cl bond breaks, so Cl⁻ leaves.\nThen H⁺ is lost from N⁺ (removed by Cl⁻ or another methylamine molecule).\nProduct: N-methylethanamide, CH₃CONHCH₃."}],
+ "bio:3.1.1":[
+  {l:1,m:3,q:"Explain why large multicellular organisms need specialised exchange surfaces, while single-celled organisms do not.",ms:["Large organisms have a small surface area to volume ratio","Diffusion distance to the inner cells is too long / diffusion across the body surface would be too slow","They have a higher metabolic rate / demand for O₂ (single-celled organisms have a large SA:V and a short diffusion distance)"],a:"Single-celled organisms have a large surface area to volume ratio and short diffusion distances, so diffusion across the cell surface is enough.\nLarge multicellular organisms have a small SA:V ratio, and the diffusion distance to their inner cells is too long. They also have a higher metabolic demand, so diffusion across the body surface alone would be too slow to supply their needs."},
+  {l:2,m:4,q:"Describe how the alveoli are adapted for efficient gas exchange.",ms:["Large surface area (many alveoli)","Thin walls – one cell thick / squamous epithelium – short diffusion distance","Surrounded by a dense capillary network – blood flow maintains a steep concentration gradient","Ventilation maintains the concentration gradient (OR elastic fibres recoil to help expel air, OR surfactant stops alveoli collapsing)"],a:"• There are millions of alveoli, which gives a very large surface area.\n• The walls are one cell thick (squamous epithelium), which keeps the diffusion distance short.\n• A dense capillary network removes oxygenated blood and brings CO₂, keeping a steep concentration gradient.\n• Ventilation replaces air in the alveoli, which also maintains the gradient. Elastic fibres recoil to help expel air, and surfactant stops the alveoli collapsing."},
+  {l:3,m:4,q:"Explain how the counter-current system in fish gills maximises the uptake of oxygen.",ms:["Blood and water flow in opposite directions across the gill lamellae","Blood always meets water that has a higher oxygen concentration","So a concentration gradient (diffusion gradient) is maintained along the whole length of the lamella","Oxygen diffuses into the blood along the entire length / about 80% of oxygen is removed (vs ~50% with parallel flow)"],a:"In the gill lamellae, blood flows in the opposite direction to water. This means blood always meets water with a higher oxygen concentration than itself. A diffusion gradient is maintained along the whole length of the lamella, so oxygen diffuses into the blood all the way along. About 80% of the oxygen in the water can be absorbed, compared with about 50% if the flow were parallel."}],
+ "bio:2.1.6":[
+  {l:1,m:3,q:"Explain how an erythrocyte (red blood cell) is adapted for its function.",ms:["Biconcave shape – large surface area to volume ratio for diffusion of oxygen","No nucleus (and few organelles) – more space for haemoglobin","Flexible – can squeeze through narrow capillaries"],a:"• Biconcave disc shape gives a large surface area to volume ratio, so oxygen diffuses in and out quickly.\n• It has no nucleus and few organelles, which leaves more room for haemoglobin to carry oxygen.\n• It's flexible, so it can squeeze through narrow capillaries."},
+  {l:2,m:4,q:"Describe the events of prophase of mitosis.",ms:["Chromatin condenses / chromosomes supercoil, becoming shorter, thicker and visible","Each chromosome is seen as two sister chromatids joined at a centromere","Nucleolus disappears and the nuclear envelope breaks down","Centrioles move to opposite poles and spindle fibres form"],a:"• The chromatin condenses (supercoils), so chromosomes become shorter, thicker and visible.\n• Each chromosome is made of two identical sister chromatids joined at the centromere.\n• The nucleolus disappears and the nuclear envelope breaks down.\n• The centrioles move to opposite poles of the cell and the spindle fibres begin to form."},
+  {l:3,m:5,q:"Explain the importance of meiosis in sexual reproduction.",ms:["Produces haploid gametes / halves the chromosome number","So the diploid number is restored at fertilisation / chromosome number stays constant between generations","Introduces genetic variation","Crossing over between non-sister chromatids of homologous chromosomes in prophase I","Independent assortment of homologous chromosomes in metaphase I (and chromatids in metaphase II)"],a:"Meiosis produces haploid gametes, halving the chromosome number. When two gametes fuse at fertilisation, the diploid number is restored, so the chromosome number stays the same from one generation to the next.\nMeiosis also creates genetic variation:\n• Crossing over between non-sister chromatids of homologous pairs in prophase I swaps alleles.\n• Independent assortment of homologous chromosomes in metaphase I, and of chromatids in metaphase II, gives many different combinations."}],
+ "bio:5.1.5":[
+  {l:1,m:4,q:"Describe the structure of a sarcomere.",ms:["Section of myofibril between two Z lines","A band (dark) – length of the myosin (thick) filaments, including where actin overlaps","I band (light) – actin (thin) filaments only","H zone – myosin only; M line in the centre"],a:"A sarcomere is the section of a myofibril between two Z lines.\n• I band (light): actin (thin) filaments only, with a Z line through its centre.\n• A band (dark): the full length of the myosin (thick) filaments, including where they overlap with actin.\n• H zone: the central part of the A band where there is only myosin.\n• M line: the middle of the sarcomere, where the myosin filaments are anchored."},
+  {l:2,m:5,q:"Describe the sliding filament model of muscle contraction, starting from the arrival of calcium ions.",ms:["Ca²⁺ binds to troponin, causing it to change shape","Tropomyosin moves, exposing myosin-binding sites on actin","Myosin heads bind to actin, forming actin–myosin cross-bridges","Power stroke: myosin head pivots, pulling actin towards the M line (ADP + Pi released)","ATP binds to the myosin head, causing it to detach; ATP is hydrolysed (by ATPase) to re-cock the head"],a:"• Ca²⁺ ions bind to troponin, which changes shape.\n• This pulls tropomyosin away, exposing the myosin-binding sites on the actin.\n• Myosin heads bind to actin, forming actin–myosin cross-bridges.\n• The myosin head pivots in the power stroke, pulling the actin filament towards the M line, and ADP and Pi are released.\n• ATP binds to the myosin head, which then detaches from actin. ATPase hydrolyses the ATP, returning the head to its original position, ready to bind again.\nThe sarcomere shortens: the I band and H zone get shorter, but the A band stays the same length."}],
+ "maths:P6":[
+  {l:1,m:3,q:"Solve 3^(2x) = 20, giving x to 3 significant figures.",ms:["Take logs of both sides: 2x ln 3 = ln 20 (or log₃20)","x = ln 20 / (2 ln 3)","x = 1.36"],a:"ln(3^(2x)) = ln 20\n2x ln 3 = ln 20\nx = ln 20 / (2 ln 3) = 2.9957… / 2.1972… = 1.36 (3 s.f.)"}],
+ "maths:P7":[
+  {l:1,m:3,q:"Given y = 3x⁴ − 2/x + √x, find dy/dx.",ms:["Rewrite: y = 3x⁴ − 2x⁻¹ + x^(1/2)","Correct differentiation of at least two terms","dy/dx = 12x³ + 2x⁻² + ½x^(−1/2)"],a:"y = 3x⁴ − 2x⁻¹ + x^(1/2)\ndy/dx = 12x³ + 2x⁻² + ½x^(−1/2)\n      = 12x³ + 2/x² + 1/(2√x)"}],
+ "maths:P8":[
+  {l:2,m:4,q:"Find the exact value of ∫ from 1 to 4 of (3√x − 2/x²) dx.",ms:["Rewrite as 3x^(1/2) − 2x⁻²","Integrate: 2x^(3/2) + 2x⁻¹","Substitute limits: (16 + ½) − (2 + 2)","= 12.5 (or 25/2)"],a:"∫(3x^(1/2) − 2x⁻²) dx = 2x^(3/2) + 2x⁻¹\nAt x = 4: 2(8) + 2/4 = 16.5\nAt x = 1: 2(1) + 2 = 4\nAnswer = 16.5 − 4 = 25/2"}]
+};
+/* Built-in multiple-choice questions (merged into SEEDS). */
+const MCQ_SEEDS={
+ "chem:3.3.7":[{l:1,q:"How many chiral centres are there in a molecule of 2,3-dichlorobutane, CH₃CHClCHClCH₃?",opts:["0","1","2","3"],ans:2,why:["Wrong – C2 and C3 each have four different groups attached.","Wrong – both C2 and C3 are chiral, not just one.","Correct – C2 and C3 are each bonded to H, Cl, CH₃ and a –CHClCH₃ group.","Wrong – the CH₃ carbons have three identical H atoms, so they can't be chiral."]}],
+ "chem:3.3.8":[{l:1,q:"Which reagent reduces propanal to propan-1-ol?",opts:["Tollens' reagent","NaBH₄","Acidified K₂Cr₂O₇","KCN followed by dilute acid"],ans:1,why:["Wrong – Tollens' reagent oxidises aldehydes to carboxylic acids.","Correct – NaBH₄ supplies H⁻ ions, which reduce the C=O to an alcohol by nucleophilic addition.","Wrong – acidified dichromate is an oxidising agent.","Wrong – this forms a hydroxynitrile, not an alcohol."]},
+   {l:2,q:"Which compound gives a silver mirror with Tollens' reagent?",opts:["Propanone","Butan-2-one","2-methylpropanal","Propan-2-ol"],ans:2,why:["Wrong – propanone is a ketone, so it isn't oxidised.","Wrong – butan-2-one is a ketone.","Correct – it's an aldehyde (the C=O is at the end of the chain), so it's oxidised and reduces Ag⁺ to Ag.","Wrong – it's a secondary alcohol, and Tollens' reagent only tests for aldehydes."]}],
+ "chem:3.3.9":[{l:1,q:"Which compound reacts with ethanol at room temperature to form ethyl ethanoate and hydrogen chloride?",opts:["Ethanoic acid","Ethanoyl chloride","Ethanamide","Ethanoic anhydride"],ans:1,why:["Wrong – it needs an acid catalyst and heat, and it gives water, not HCl.","Correct – nucleophilic addition–elimination, with Cl⁻ as the leaving group, giving HCl.","Wrong – amides don't react with ethanol to form esters under these conditions.","Wrong – it does form the ester, but the by-product is ethanoic acid, not HCl."]}],
+ "bio:3.1.1":[{l:1,q:"Which feature of the trachea prevents it from collapsing during inspiration?",opts:["Smooth muscle","Ciliated epithelium","C-shaped rings of cartilage","Elastic fibres"],ans:2,why:["Wrong – smooth muscle contracts to narrow the airway.","Wrong – cilia move mucus up and away from the lungs.","Correct – the cartilage rings give support and keep the airway open.","Wrong – elastic fibres recoil to help the airway return to shape after stretching."]}],
+ "bio:2.1.6":[{l:1,q:"During which stage of mitosis do sister chromatids separate and move to opposite poles?",opts:["Prophase","Metaphase","Anaphase","Telophase"],ans:2,why:["Wrong – in prophase the chromosomes condense and the nuclear envelope breaks down.","Wrong – in metaphase the chromosomes line up at the equator.","Correct – the centromeres divide and spindle fibres shorten, pulling the chromatids apart.","Wrong – in telophase the nuclear envelopes reform around the separated chromosomes."]}],
+ "bio:5.1.5":[{l:1,q:"Which part of a sarcomere stays the same length during contraction?",opts:["I band","H zone","A band","Distance between Z lines"],ans:2,why:["Wrong – the I band shortens as actin slides over myosin.","Wrong – the H zone shortens and can disappear.","Correct – the A band is the length of the myosin filaments, which don't change length.","Wrong – the Z lines move closer together, so the sarcomere shortens."]}],
+ "maths:P7":[{l:1,q:"The gradient of the curve y = x³ − 6x at the point where x = 2 is:",opts:["−4","6","0","12"],ans:1,why:["Wrong – that's the value of y at x = 2, not the gradient.","Correct – dy/dx = 3x² − 6, so at x = 2 it's 12 − 6 = 6.","Wrong – dy/dx = 0 only where x = ±√2.","Wrong – you forgot to subtract the 6 from 3x²."]}]
+};
+Object.keys(MCQ_SEEDS).forEach(k=>{(SEEDS[k]=SEEDS[k]||[]);MCQ_SEEDS[k].forEach(x=>SEEDS[k].push({type:"mcq",l:x.l,m:1,q:x.q,opts:x.opts,ans:x.ans,why:x.why,ms:[x.opts[x.ans]],a:x.why[x.ans]}))});
+
+
+/* Progress: a "pass" is a question scored 90%+. 100 passes = mastered. */
+const GOAL=100,PASS=.9;
+const TIERS=[0,10,25,50,75,100];
+const LV=[{n:"Not started",c:"#2a2e37",t:"#8b919e"},{n:"Bronze · 10",c:"#8a3d36",t:"#ffd4cf"},{n:"Silver · 25",c:"#b4772a",t:"#fff0d6"},{n:"Gold · 50",c:"#c9b93a",t:"#1f1c05"},{n:"Strong · 75",c:"#8fc441",t:"#152005"},{n:"Mastered · 100",c:"#c8f169",t:"#141a05"}];
+const DIFF=["","Recall","Apply","Exam","Hard","A*"];
+S.study.p=S.study.p||{};
+if(!S.study.migrated){S.study.att.forEach(a=>{const p=(S.study.p[a.t]=S.study.p[a.t]||{n:0,pass:0,perfect:0});p.n++;if(a.s/a.m>=PASS)p.pass++;if(a.s===a.m)p.perfect++});S.study.migrated=1;save()}
+const prog=id=>S.study.p[id]||{n:0,pass:0,perfect:0};
+const passes=id=>Math.min(GOAL,prog(id).pass);
+const mast=id=>{const n=passes(id);let t=0;TIERS.forEach((v,i)=>{if(i&&n>=v)t=i});return t};
+
+/* ================= STUDY UI ================= */
+/* Modes: "normal" (counts toward 100), "mcq" (quick-fire practice), "review" (mistake bank). Only fresh questions in normal mode count toward the 100. */
+S.study.miss=S.study.miss||{};S.study.weak=S.study.weak||{};S.study.queue=S.study.queue||{};S.study.subs=S.study.subs||{};
+const BOX_DAYS=[1,3,7];   /* review spacing; 3 correct reviews in a row clears a mistake */
+let st={subj:null,topic:null,q:null,photos:[],typed:"",res:null,busy:false,err:null,self:null,mode:"normal",global:false};
+const DAY=864e5;
+const dueList=topicId=>Object.values(S.study.miss).filter(m=>(!topicId||m.t===topicId)&&m.due<=Date.now()).sort((a,b)=>a.due-b.due);
+const missList=topicId=>Object.values(S.study.miss).filter(m=>!topicId||m.t===topicId);
+const totalAnswered=()=>Object.values(S.study.p).reduce((a,p)=>a+p.n,0);
+function legend(){return `<div class="legend">${LV.map(l=>`<span style="background:${l.c};color:${l.t}">${l.n}</span>`).join("")}</div>`}
+
+function renderStudy(){const R=$("studyRoot");
+  if(!st.subj){const due=dueList().length,banked=missList().length;
+    R.innerHTML=`<header class="top"><div><div class="date">A-level revision</div><h1>Study</h1></div><div class="pill">✎ <b style="color:var(--violet)">${totalAnswered()}</b> answered</div></header>
+     <p class="intro">Topics follow your spec. To master a topic, score <b>90%+ on 100 fresh questions</b>. Its colour upgrades at 10, 25, 50, 75 and 100, and the questions get harder as you go. Anything you get wrong goes into your <b>mistake bank</b> and comes back until you've nailed it.</p>
+     ${focusCard()}
+     ${banked?`<button class="btn ${due?"vio":""} wide" data-act="globalreview" style="margin-bottom:14px">🔁 ${due?`Review ${due} mistake${due>1?"s":""} due now`:`Mistake bank: ${banked} (none due yet)`}</button>`:""}`+
+     SUBJECTS.map(s=>{const ids=Object.values(TOPIC).filter(t=>t.subj===s);const avg=ids.reduce((a,t)=>a+passes(t.id),0)/(ids.length*GOAL);
+      const sd=dueList().filter(m=>TOPIC[m.t]&&TOPIC[m.t].subj===s).length;
+      return `<button class="subj" data-subj="${s.id}"><div style="display:flex;justify-content:space-between;align-items:center"><div><h3>${s.icon} ${s.name}</h3><small>${s.board} · ${ids.length} topics${sd?` · <span style="color:var(--amber)">${sd} to review</span>`:""}</small></div><b style="font-family:'Space Grotesk';font-size:22px">${Math.round(avg*100)}%</b></div>
+       <div class="mini">${ids.map(t=>`<i style="background:${LV[mast(t.id)].c}" title="${esc(t.code)}"></i>`).join("")}</div></button>`}).join("")+legend()+
+     `<div class="note" style="margin-top:12px">The questions and model answers are original, written in the style of real exam papers and Physics & Maths Tutor practice questions. They aren't copied from them, so use real past papers alongside this app too.</div>`;
+    return}
+  const s=SUBJECTS.find(x=>x.id===st.subj);
+  if(!st.topic){
+    R.innerHTML=`<button class="back" data-back="1">‹ Subjects</button><header class="top"><div><div class="date">${esc(s.board)}</div><h1>${s.icon} ${esc(s.name)}</h1></div></header>`+legend()+
+     s.mods.map(m=>`<div class="mod"><h4>${esc(m[0])}</h4>`+m[1].map(t=>{const id=s.id+":"+t[0],lv=mast(id),P=prog(id),ps=passes(id),d=dueList(id).length;
+       return `<button class="topic" data-topic="${id}"><span class="sw" style="background:${LV[lv].c}"></span><span class="t">${esc(t[0])} ${esc(t[1])}<small>${P.n?`${P.n} answered · ${P.perfect} perfect`:"Not started"}${d?` · <span style="color:var(--amber)">🔁 ${d} due</span>`:""}</small><span class="track" style="display:block;height:5px;margin-top:6px"><i style="width:${ps}%;background:${LV[Math.max(1,lv)].c}"></i></span></span><span class="lv" style="background:${LV[lv].c};color:${LV[lv].t}">${ps}/${GOAL}</span></button>`}).join("")+`</div>`).join("");
+    return}
+  renderTopic(R);
+}
+/* Difficulty climbs every 15 passes (A* from 60 passes); drops one step after 2 misses in the last 3 fresh questions. */
+function nextLevel(id){let L=Math.min(5,1+Math.floor(passes(id)/15));
+  const rec=S.study.att.filter(a=>a.t===id&&!a.x).slice(-3);if(rec.length===3&&rec.filter(a=>a.s/a.m<PASS).length>=2)L=Math.max(1,L-1);return L}
+function pickSeed(id,mcqOnly){const L=nextLevel(id);const done=S.study.done;
+  const list=(SEEDS[id]||[]).map((q,i)=>Object.assign({type:"written"},q,{key:id+"#s"+i,seed:1})).filter(q=>!mcqOnly||q.type==="mcq");
+  return list.find(q=>q.l===L&&!done[q.key])||list.find(q=>q.l<=L&&!done[q.key])||null}
+
+function modeChip(q){
+  if(q.review)return `<div class="note warn" style="margin-bottom:10px;padding:8px 12px">🔁 ${q.instant?"Extra practice: doesn't count, and it isn't due yet. Check whether it's stuck.":`Mistake review ${(S.study.miss[q.key]||{box:0}).box+1}/3. Get 3 reviews right in a row to clear it.`}</div>`;
+  if(st.mode==="mcq")return `<div class="note" style="margin-bottom:10px;padding:8px 12px">⚡ Quick-fire practice. Doesn't count toward 100, but wrong answers go into your mistake bank.</div>`;
+  return ""}
+
+function renderTopic(R){const T=TOPIC[st.topic];const lv=mast(T.id);const L=nextLevel(T.id);
+  const due=dueList(T.id).length,banked=missList(T.id).length,weak=(S.study.weak[T.id]||[]);
+  let h=`<button class="back" data-back="2">‹ ${st.global?"Study":esc(T.subj.name)}</button>
+   <header class="top"><div><div class="date">${esc(T.mod)}</div><h1 style="font-size:23px">${esc(T.code)} ${esc(T.name)}</h1></div></header>
+   <div class="qcard" style="padding:14px 16px"><div style="display:flex;justify-content:space-between;align-items:center;font-size:13.5px"><span><b style="font-family:'Space Grotesk';font-size:26px">${passes(T.id)}</b><span style="color:var(--mute)"> / ${GOAL} at 90%+</span></span><span class="lv" style="background:${LV[lv].c};color:${LV[lv].t}">${LV[lv].n}</span></div>
+   <div class="track" style="height:10px"><i style="width:${passes(T.id)}%;background:${LV[Math.max(1,lv)].c}"></i></div>
+   <div class="ladder">${[1,2,3,4,5].map(i=>`<i style="background:${i<=lv?LV[i].c:"var(--line)"}"></i>`).join("")}</div>
+   <div style="font-size:12.5px;color:var(--mute);margin-top:6px">${lv>=5?"Mastered 🏆 Keep going to stay sharp.":`${TIERS[lv+1]-passes(T.id)} more at 90%+ to reach ${LV[lv+1].n.split(" ·")[0]}`} · ${prog(T.id).perfect} perfect scores · difficulty now: ${DIFF[L]}</div></div>`;
+  if(st.mode==="terms"&&st.terms){R.innerHTML=h+termsHtml();const ti=$("termIn");if(ti&&!st.terms.state)ti.focus();return}
+  if(!st.q){
+    h+=`<button class="btn vio wide" data-act="newq" data-mode="normal" ${st.busy?"disabled":""}>${st.busy&&st.mode==="normal"?`<span class="spin"></span> Writing questions…`:`Next question · ${DIFF[L]}`}</button>
+     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px">
+      <button class="btn" data-act="newq" data-mode="mcq" ${st.busy?"disabled":""}>${st.busy&&st.mode==="mcq"?`<span class="spin"></span>`:"⚡ MCQs"}</button>
+      <button class="btn" data-act="terms" ${st.busy?"disabled":""}>${st.busy&&st.mode==="terms"?`<span class="spin"></span>`:"🔤 Key terms"}</button>
+      <button class="btn ${due?"pri":""}" data-act="newq" data-mode="review" ${banked&&!st.busy?"":"disabled"}>🔁 ${due?`${due} due`:banked?`${banked} banked`:"0 mistakes"}</button></div>`;
+    if(!AI)h+=`<div class="note" style="margin-top:12px">${(SEEDS[T.id]||[]).length?"Without the AI, you'll get the built-in questions and mark yourself against the mark scheme.":"This topic needs the AI to write questions."} The AI needs setting up: add your API key in Home → AI settings.</div>`;
+    if(st.err)h+=`<div class="note warn" style="margin-top:12px">${esc(st.err)}</div>`;
+    if(weak.length)h+=`<section class="block" style="margin-top:14px"><h2><span>⚠️ Your weak points</span><button class="rm" data-act="clearweak" style="font-size:12.5px">Clear</button></h2>
+      <div class="pad" style="padding-top:4px">${weak.slice(-8).reverse().map(w=>`<div class="pt" style="border:0;padding:5px 0"><span class="ic n">!</span><div>${esc(w.p)}<small>${new Date(w.ts).toLocaleDateString("en-GB",{day:"numeric",month:"short"})}</small></div></div>`).join("")}
+      <div style="font-size:12.5px;color:var(--mute);margin-top:6px">New questions will keep re-testing these in different ways.</div></div></section>`;
+    const hist=S.study.att.filter(a=>a.t===T.id).slice(-6).reverse();
+    if(hist.length)h+=`<section class="block" style="margin-top:14px"><h2><span>Recent attempts</span></h2>`+hist.map(a=>`<div class="set"><div class="t">${a.k==="mcq"?"MCQ":DIFF[a.l]}${a.x?` · <span style="color:var(--mute)">${a.x}</span>`:""} · ${a.s}/${a.m}<br><small>${new Date(a.ts).toLocaleDateString("en-GB",{day:"numeric",month:"short"})}</small></div><span class="tag ${a.s/a.m>=PASS?"ok":a.s/a.m<.5?"due":""}">${Math.round(a.s/a.m*100)}%${a.s/a.m>=PASS?" ✓":""}</span></div>`).join("")+`</section>`;
+    R.innerHTML=h;return}
+  const q=st.q;const isM=q.type==="mcq";
+  h+=modeChip(q)+`<div class="qcard"><div class="qh"><span class="lv" style="background:var(--card2);color:var(--violet)">${isM?"Multiple choice":"Difficulty "+q.l+"/5 · "+DIFF[q.l]}</span><span class="marks">[${q.m} mark${q.m>1?"s":""}]</span></div>${q.sub?`<div style="font-size:12px;color:var(--mute);margin:-4px 0 8px">${esc(q.sub)}</div>`:""}<div class="qtext">${esc(q.q)}</div>`;
+  if(isM){const r=st.res;
+    h+=`<div style="display:grid;gap:8px;margin-top:14px">`+q.opts.map((o,i)=>{let sty="",mark="";
+      if(r){if(i===q.ans){sty="background:var(--goodbg);border-color:var(--good)";mark=" ✓"}else if(i===r.pick){sty="background:#3a1c18;border-color:var(--warn)";mark=" ✗"}}
+      return `<button class="btn" data-pick="${i}" style="text-align:left;border:1px solid var(--line);${sty}" ${r?"disabled":""}><b style="color:var(--violet)">${"ABCD"[i]}</b>&nbsp; ${esc(o)}${mark}</button>`+
+        (r&&q.why&&q.why[i]&&(i===q.ans||i===r.pick)?`<div style="font-size:13px;color:#c9cdd6;margin:-2px 4px 4px">${esc(q.why[i])}</div>`:"")}).join("")+`</div>`;
+    if(r&&q.why)h+=`<details style="margin-top:10px"><summary>Why the other options are wrong</summary><div class="model">${q.opts.map((o,i)=>i===q.ans||i===r.pick?"":`${"ABCD"[i]}. ${esc(q.why[i]||"")}`).filter(Boolean).join("\n")}</div></details>`;
+  }
+  h+=`</div>`;
+  if(isM&&!st.res){R.innerHTML=h;return}
+  if(isM&&st.res){const r=st.res;h+=`<div class="res" style="padding:12px 16px"><b style="color:${r.score?"var(--good)":"var(--warn)"}">${r.score?"Correct":"Not quite"}</b> <small style="color:var(--mute)">${resultNote(r)}</small></div>`+nextButtons(r);R.innerHTML=h;return}
+  if(!st.res&&!st.self){
+    h+=`<section class="block"><h2><span>Your answer</span></h2><div class="pad">
+      <div class="row2"><label class="btn vio filebtn">📷 Photo of answer<input type="file" accept="image/*" id="ansPhoto" multiple></label><button class="btn" data-act="clearph" ${st.photos.length?"":"disabled"}>Clear photos</button></div>
+      <div class="prev">${st.photos.map(p=>`<img src="${p.url}" alt="Answer photo">`).join("")}</div>
+      <textarea id="ansText" placeholder="…or type your answer here" style="margin-top:10px">${esc(st.typed)}</textarea>
+      <button class="btn pri wide" data-act="mark" style="margin-top:10px" ${st.busy?"disabled":""}>${st.busy?`<span class="spin"></span> Marking…`:AI?"Mark my answer":"Mark it myself"}</button>
+      ${AI?`<button class="btn wide" data-act="selfmark" style="margin-top:8px">Mark it myself instead</button>`:""}
+      <button class="btn wide" data-act="skip" style="margin-top:8px;background:none;color:var(--mute)">I don't know – show the model answer</button>
+     </div></section>`;
+    if(st.err)h+=`<div class="note warn">${esc(st.err)}</div>`;
+  }else if(st.self&&!st.res){
+    h+=`<section class="block"><h2><span>Tick each marking point you got</span></h2><div class="pad selfm">`+
+      q.ms.map((p,i)=>`<div class="item ${st.self[i]?"done":""}" data-sm="${i}"><div class="check"></div><div class="t"><span>${esc(p)}</span></div></div>`).join("")+
+      `<button class="btn pri wide" data-act="selfdone" style="margin-top:10px">Done</button></div></section>`;
+  }else{
+    const r=st.res;const pct=r.score/r.max;const col=pct>=PASS?"var(--good)":pct>=.5?"var(--amber)":"var(--warn)";
+    h+=`<div class="res"><div style="display:flex;justify-content:space-between;align-items:flex-end"><div><div class="score" style="color:${col}">${r.score}/${r.max}</div><small style="color:var(--mute)">${Math.round(pct*100)}% · ${resultNote(r)}</small></div>${r.self?`<span class="tag">Self-marked</span>`:`<span class="tag">AI-marked</span>`}</div>`;
+    h+=annoHtml(r);
+    if(r.points&&r.points.length)h+=`<div style="margin-top:12px">`+r.points.map(p=>`<div class="pt"><span class="ic ${p.awarded?"y":"n"}">${p.awarded?"✓":"✗"}</span><div>${esc(p.point)}${p.comment?`<small>${esc(p.comment)}</small>`:""}</div></div>`).join("")+`</div>`;
+    if(r.wentWrong)h+=`<div style="margin-top:12px"><b>Where you went wrong</b><div style="color:#c9cdd6;font-size:14px;margin-top:4px;white-space:pre-wrap">${esc(r.wentWrong)}</div></div>`;
+    if(r.misconception)h+=`<div class="note warn" style="margin:12px 0 0">🧠 <b>Misconception:</b> ${esc(r.misconception)}</div>`;
+    if(r.wording&&r.wording.length)h+=`<div style="margin-top:12px"><b>Sharpen your wording</b>`+r.wording.map(w=>`<div class="fix"><s>${esc(w.yours)}</s><br>→ <ins>${esc(w.better)}</ins></div>`).join("")+`</div>`;
+    if(r.nextTip)h+=`<div class="note" style="margin:12px 0 0">💡 ${esc(r.nextTip)}</div>`;
+    h+=`<details ${r.skipped?"open":""}><summary>Model answer</summary><div class="model">${esc(q.a)}</div></details>
+      <details><summary>Mark scheme</summary><div class="model">${q.ms.map((p,i)=>(i+1)+". "+esc(p)).join("\n")}</div></details></div>`+nextButtons(r);
+  }
+  R.innerHTML=h;
+}
+/* Marked-up answer: highlights on the photo + colour-coded transcript + numbered corrections */
+let annoOff=false;
+function clamp01(v){v=+v;return isFinite(v)?Math.max(0,Math.min(1,v)):null}
+function annoHtml(r){const A=(r.annotations||[]).filter(a=>a&&a.kind).map((a,i)=>Object.assign({},a,{n:i+1,kind:["correct","wrong","vague","missing"].includes(a.kind)?a.kind:"vague"}));
+  if(!A.length&&!r.readAs)return "";
+  let h=`<div style="margin-top:14px"><div style="display:flex;justify-content:space-between;align-items:center"><b>Your answer, marked</b>${(r.shots||[]).length?`<button data-act="annotoggle" style="padding:0;border:0;background:none;color:var(--blue);font:inherit;font-size:13px;cursor:pointer">${annoOff?"Show":"Hide"} highlights</button>`:""}</div>
+   <div class="keyrow"><span><i style="background:#7ee05a"></i>earned a mark</span><span><i style="background:#ff6b5b"></i>wrong</span><span><i style="background:#ffc14d"></i>too vague</span><span><i style="background:#7ab8ff"></i>missing</span></div>`;
+  (r.shots||[]).forEach((u,pi)=>{h+=`<div class="anno ${annoOff?"off":""}"><img src="${u}" alt="Your answer, photo ${pi+1}">`+
+    A.filter(a=>a.kind!=="missing"&&a.box&&(+a.photo||0)===pi).map(a=>{const[x,y,w,hh]=a.box.map(clamp01);if([x,y,w,hh].some(v=>v==null)||w<=0||hh<=0)return "";
+      return `<span class="bx ${a.kind}" style="left:${x*100}%;top:${y*100}%;width:${Math.min(w,1-x)*100}%;height:${Math.min(hh,1-y)*100}%"></span><button class="bdg ${a.kind}" data-ann="${a.n}" style="left:${x*100}%;top:${y*100}%" aria-label="Note ${a.n}">${a.n}</button>`}).join("")+`</div>`});
+  if((r.shots||[]).length)h+=`<div style="font-size:12px;color:var(--mute);margin-top:6px">Boxes on the photo are approximate. The numbered notes below are what matters.</div>`;
+  if(r.readAs){let t=esc(r.readAs);
+    A.filter(a=>a.kind!=="missing"&&a.text).sort((a,b)=>b.text.length-a.text.length).forEach(a=>{const e=esc(a.text.trim());if(!e)return;
+      const i=t.toLowerCase().indexOf(e.toLowerCase());if(i<0||/<[^>]*$/.test(t.slice(0,i)))return;
+      t=t.slice(0,i)+`<mark class="${a.kind}">${t.slice(i,i+e.length)}<sup>${a.n}</sup></mark>`+t.slice(i+e.length)});
+    h+=`<div class="trans">${t}</div>`}
+  if(A.length)h+=`<div style="margin-top:8px">`+A.map(a=>`<div class="ann" id="ann${a.n}"><span class="num ${a.kind}">${a.n}</span><div>${a.text&&a.kind!=="missing"?`<q>${esc(a.text)}</q>`:""}${a.kind==="missing"?"<b>Missing: </b>":""}${esc(a.note||"")}${a.fix&&a.kind!=="correct"?`<div class="fx">→ ${a.kind==="missing"?"Add":"Write"}: ${esc(a.fix)}</div>`:""}</div></div>`).join("")+`</div>`;
+  return h+`</div>`}
+function resultNote(r){const T=TOPIC[st.topic];const pct=r.score/r.max;let s=r.skipped?"added to your mistake bank":"";
+  if(!r.skipped){if(r.counts)s=pct>=PASS?`counts ✓ (${passes(T.id)}/${GOAL})`:"under 90%, added to your mistake bank";
+    else if(st.q.review&&!st.q.instant)s=pct>=PASS?(r.cleared?"mistake cleared 🎉":`review passed, back in ${BOX_DAYS[(S.study.miss[st.q.key]||{box:0}).box]||"–"} days`):"still shaky, back tomorrow";
+    else s=pct>=PASS?"nice":"added to your mistake bank"}
+  return s+(r.up?" · colour upgraded 🎉":"")}
+function nextButtons(r){const T=TOPIC[st.topic];const pct=r.score/r.max;const due=st.global?dueList().length:dueList(T.id).length;
+  let label=st.mode==="mcq"?"Next MCQ ⚡":st.mode==="review"?(due?`Next mistake (${due} due)`:"Back to topic"):`Next question · ${DIFF[nextLevel(T.id)]}`;
+  let h=`<button class="btn vio wide" data-act="${st.mode==="review"&&!due?"done":"newq"}" data-mode="${st.mode}" ${st.busy?"disabled":""}>${st.busy?`<span class="spin"></span> Writing questions…`:label}</button>`;
+  if(pct<PASS&&!st.q.instant)h+=`<button class="btn wide" data-act="retry" style="margin-top:8px">↻ Try this one again now</button>`;
+  if(st.mode!=="normal")h+=`<button class="btn wide" data-act="done" style="margin-top:8px;background:none;color:var(--mute)">Finish</button>`;
+  if(st.err)h+=`<div class="note warn" style="margin-top:12px">${esc(st.err)}</div>`;
+  return h}
+
+const R0=$("studyRoot");
+R0.addEventListener("click",async e=>{
+  const sb=e.target.closest("[data-subj]");if(sb){st.subj=sb.dataset.subj;st.global=false;return renderStudy()}
+  const tp=e.target.closest("[data-topic]");if(tp){openTopic(tp.dataset.topic);return}
+  const bk=e.target.closest("[data-back]");if(bk){if(bk.dataset.back==="1"||st.global){st.subj=null;st.global=false}st.topic=null;clearQ();st.terms=null;st.mode="normal";window.scrollTo(0,0);return renderStudy()}
+  const sm=e.target.closest("[data-sm]");if(sm){st.self[+sm.dataset.sm]=!st.self[+sm.dataset.sm];return renderStudy()}
+  const pk=e.target.closest("[data-pick]");if(pk&&!st.res){const i=+pk.dataset.pick;const q=st.q;const ok=i===q.ans;
+    finish({score:ok?1:0,max:1,pick:i,self:1,mcq:1,points:[{point:q.opts[q.ans],awarded:ok}],missed:ok?[]:[`MCQ: ${q.q.slice(0,90)} → ${q.opts[q.ans]}`]});return}
+  const an=e.target.closest("[data-ann]");if(an){const el=$("ann"+an.dataset.ann);if(el){document.querySelectorAll(".ann.hot").forEach(x=>x.classList.remove("hot"));el.classList.add("hot");el.scrollIntoView({behavior:"smooth",block:"center"})}return}
+  const b=e.target.closest("[data-act]");if(!b||b.disabled)return;const act=b.dataset.act;
+  if(act==="annotoggle"){annoOff=!annoOff;return renderStudy()}
+  if(act==="fstart")return fStart();if(act==="fpause")return fPause();if(act==="freset")return fReset();if(act==="fswitch")return fSwitch();
+  if(act==="terms"||act==="tagain")return startTerms();
+  if(act==="tcheck")return tCheck(false);if(act==="tskip")return tCheck(true);
+  if(act==="tnext"){st.terms.i++;st.terms.state=null;st.terms.input="";return renderStudy()}
+  if(act==="tdone"){st.terms=null;st.mode="normal";return renderStudy()}
+  if(act==="newq"){st.mode=b.dataset.mode||st.mode||"normal";return newQuestion()}
+  if(act==="globalreview"){const d=dueList();if(!d.length){toast("Nothing due yet – come back tomorrow");return}st.global=true;st.mode="review";openTopic(d[0].t,true);return newQuestion()}
+  if(act==="done"){clearQ();st.mode="normal";if(st.global){st.global=false;st.subj=null;st.topic=null}window.scrollTo(0,0);return renderStudy()}
+  if(act==="retry"){const q=Object.assign({},st.q,{review:true,instant:true});clearQ();st.q=q;window.scrollTo(0,0);return renderStudy()}
+  if(act==="clearweak"){delete S.study.weak[st.topic];save();return renderStudy()}
+  if(act==="clearph"){resetAns(true);return renderStudy()}
+  if(act==="skip"){finish({score:0,max:st.q.m,skipped:1,self:1,missed:st.q.ms.slice(0,2)});return}
+  if(act==="selfmark"){st.self=st.q.ms.map(()=>false);return renderStudy()}
+  if(act==="selfdone"){const s=Math.min(st.q.m,st.self.filter(Boolean).length);finish({score:s,max:st.q.m,self:1,points:st.q.ms.map((p,i)=>({point:p,awarded:st.self[i]}))});return}
+  if(act==="mark"){if(!AI){st.self=st.q.ms.map(()=>false);return renderStudy()}return aiMark()}
+});
+R0.addEventListener("input",e=>{if(e.target.id==="ansText")st.typed=e.target.value;if(e.target.id==="termIn"&&st.terms)st.terms.input=e.target.value});
+R0.addEventListener("keydown",e=>{if(e.target.id==="termIn"&&e.key==="Enter"){e.preventDefault();tCheck(false)}});
+R0.addEventListener("change",async e=>{if(e.target.id!=="ansPhoto")return;const fs=[...e.target.files].slice(0,4-st.photos.length);
+  for(const f of fs){const b=await shrink(f);st.photos.push({blob:b,url:URL.createObjectURL(b)})}renderStudy()});
+function openTopic(id,keep){st.topic=id;st.subj=TOPIC[id].subj.id;clearQ();st.terms=null;if(!keep)st.mode="normal";window.scrollTo(0,0);renderStudy()}
+function clearQ(){st.q=null;st.res=null;st.self=null;st.err=null;resetAns()}
+function resetAns(keepText){st.photos.forEach(p=>URL.revokeObjectURL(p.url));st.photos=[];if(!keepText)st.typed=""}
+function markDone(){if(st.q&&st.q.key)S.study.done[st.q.key]=1;save()}
+
+/* ---- question supply ---- */
+let filling={};
+function qKey(T,kind){return T.id+"|"+kind}
+async function fillQueue(T,L,kind){const k=qKey(T,kind);if(filling[k])return filling[k];
+  filling[k]=(async()=>{try{const qs=await genBatch(T,L,kind);const Q=(S.study.queue[T.id]=S.study.queue[T.id]||[]);qs.forEach(q=>Q.push(q));save()}finally{filling[k]=null}})();
+  return filling[k]}
+function takeQueued(id,L,kind){const Q=S.study.queue[id]||[];const ok=q=>kind==="mcq"?q.type==="mcq":!q.mcqDrill;
+  let i=Q.findIndex(q=>ok(q)&&(kind==="mcq"||q.l===L));if(i<0&&kind!=="mcq")i=Q.findIndex(q=>ok(q)&&Math.abs(q.l-L)===1);if(i<0)return null;return Q.splice(i,1)[0]}
+function queuedCount(id,L,kind){return (S.study.queue[id]||[]).filter(q=>kind==="mcq"?q.type==="mcq":(!q.mcqDrill&&q.l===L)).length}
+
+async function newQuestion(){
+  if(st.mode==="review"){const list=st.global?dueList():dueList(st.topic);const pool=list.length?list:missList(st.topic).sort((a,b)=>a.due-b.due);
+    if(!pool.length){clearQ();st.mode="normal";toast("Mistake bank empty 🎉");return renderStudy()}
+    const m=pool[0];if(st.global)openTopic(m.t,true);else clearQ();
+    st.q=Object.assign({},m.q,{review:true,key:m.key,instant:m.due>Date.now()||undefined});window.scrollTo(0,0);return renderStudy()}
+  const T=TOPIC[st.topic];clearQ();const kind=st.mode==="mcq"?"mcq":"normal";const L=nextLevel(T.id);
+  const seed=pickSeed(T.id,kind==="mcq");
+  if(seed&&(kind==="mcq"||seed.l===L||!AI)){st.q=seed;window.scrollTo(0,0);return renderStudy()}
+  let q=takeQueued(T.id,L,kind);
+  if(q){st.q=q;save();window.scrollTo(0,0);renderStudy();await aiReady;if(AI&&queuedCount(T.id,L,kind)<2)fillQueue(T,L,kind).catch(()=>{});return}
+  await aiReady;
+  if(!AI){if(seed){st.q=seed;return renderStudy()}st.err="You've done all the built-in questions here. More need the AI. Add your API key in Home → AI settings.";return renderStudy()}
+  st.busy=true;renderStudy();
+  try{await fillQueue(T,L,kind);q=takeQueued(T.id,L,kind);if(!q)throw new Error("Couldn't get a question. Try again.");st.q=q;save()}catch(e){st.err=aiErr(e)}
+  st.busy=false;window.scrollTo(0,0);renderStudy();
+}
+async function genBatch(T,L,kind){
+  const recent=(S.study.gen[T.id]||[]).slice(-25).map(q=>q.q.slice(0,110));
+  const seen=(SEEDS[T.id]||[]).map(q=>q.q.slice(0,110)).concat(recent);
+  const subs=(S.study.subs[T.id]||[]).slice(-12);
+  const weak=(S.study.weak[T.id]||[]).slice(-10).map(w=>w.p);
+  const subj=T.subj;const mcq=kind==="mcq";
+  const prompt=`You are a senior A-level examiner writing ORIGINAL practice questions for ${subj.board} A-level ${subj.name}, specification topic ${T.code} "${T.name}" (${T.mod}).
+Write in the exact style and command words of real ${subj.board} exam papers and the topic-by-topic practice questions on Physics & Maths Tutor, but do NOT copy any real past-paper question.
+${mcq?`Write SIX multiple-choice questions (4 options, A–D, exactly one correct). Mix recall, application and data/calculation items. Every wrong option (distractor) must be plausible and based on a COMMON student misconception or calculation slip for this topic.`:
+`Write FOUR questions. Exactly ONE must be a multiple-choice question (4 options, exactly one correct, distractors based on common misconceptions); the other three are written-answer questions.`}
+Each question must test a DIFFERENT learning outcome / sub-point of ${T.code}. Prefer sub-points NOT in this recently-covered list: ${JSON.stringify(subs)}.
+TARGET MISTAKES: build questions around the errors examiners' reports most often highlight for this topic (common misconceptions, confused terms, missing key words, units/significant figures, sign errors, incomplete mechanisms).
+${weak.length?`The student recently MISSED these marking points: ${JSON.stringify(weak)}. At least ${mcq?"TWO":"ONE"} question(s) must re-test one of these in a fresh way (new context or wording, not the same question).`:""}
+${mcq?"":`Written questions are difficulty level ${L} of 5:
+1 = recall of definitions/key facts (1–3 marks)
+2 = describe/apply in a familiar context (3–4 marks)
+3 = typical exam "explain"/calculation question (4–6 marks)
+4 = harder multi-step or unfamiliar context, A/A* discriminator (5–7 marks)
+5 = hardest synoptic/extended-response or multi-part problem (6–9 marks)`}
+Stay within this spec topic. Questions must be answerable without seeing a diagram; give data, tables or structures in text. For maths use plain text with Unicode (x², √, ∫, ≤, π, θ), no LaTeX. For chemistry use Unicode subscripts (H₂O) and condensed formulae.
+Do not repeat or closely resemble these: ${JSON.stringify(seen)}
+Written questions: the mark scheme lists one creditworthy marking point per mark in precise examiner wording; the model answer is a perfect full-mark answer.
+MCQs: marks = 1; "explanations" gives one sentence per option saying why it is right or exactly which misconception makes it wrong.
+Reply with ONLY this JSON: {"questions":[{"type":"written"|"mcq","subtopic":string,"question":string,"marks":integer,"markscheme":[string],"modelAnswer":string,"options":[string,string,string,string],"answer":0-3,"explanations":[string,string,string,string]}]} (options/answer/explanations only for mcq; markscheme/modelAnswer only for written).`;
+  const r=await ask(prompt,null,L>=4&&!mcq?"complex":"default");
+  const list=(r.questions||[]).filter(x=>{if(!x||!x.question)return false;
+    if(x.type==="mcq")return Array.isArray(x.options)&&x.options.length===4&&x.answer>=0&&x.answer<4;
+    return Array.isArray(x.markscheme)&&x.markscheme.length});
+  if(!list.length)throw new Error("The AI returned incomplete questions. Try again.");
+  const gen=(S.study.gen[T.id]=S.study.gen[T.id]||[]);const sb=(S.study.subs[T.id]=S.study.subs[T.id]||[]);
+  return list.map((x,i)=>{gen.push({q:String(x.question)});if(x.subtopic)sb.push(String(x.subtopic).slice(0,60));
+    while(gen.length>40)gen.shift();while(sb.length>20)sb.shift();
+    const base={l:mcq?L:L,q:String(x.question),sub:x.subtopic?String(x.subtopic):"",key:"g"+Date.now().toString(36)+i,mcqDrill:mcq||undefined};
+    if(x.type==="mcq"){const opts=x.options.map(String),ans=parseInt(x.answer),why=(x.explanations||[]).map(String);
+      return Object.assign(base,{type:"mcq",m:1,opts,ans,why,ms:[opts[ans]],a:why[ans]||""})}
+    return Object.assign(base,{type:"written",m:Math.max(1,parseInt(x.marks)||x.markscheme.length),ms:x.markscheme.map(String),a:String(x.modelAnswer||"")})});
+}
+async function aiMark(){const q=st.q;const typed=(st.typed||"").trim();
+  if(!st.photos.length&&!typed){st.err="Add a photo of your written answer, or type it.";return renderStudy()}
+  if(st.photos.length&&!AIimg&&!typed){st.err="Photo marking isn't available in this view. Type your answer instead, or mark it yourself.";return renderStudy()}
+  st.busy=true;st.err=null;renderStudy();
+  const T=TOPIC[st.topic];
+  const prompt=`You are a strict but encouraging ${T.subj.board} A-level ${T.subj.name} examiner. Mark the student's answer to this question exactly as the exam board would, using the mark scheme. Award a mark only when a marking point is clearly made. Accept equivalent correct wording, but not vague answers. For calculations, award method marks where earned.
+QUESTION (${q.m} marks): ${q.q}
+MARK SCHEME (one point per mark): ${JSON.stringify(q.ms)}
+MODEL ANSWER: ${q.a}
+${st.photos.length?"The student's handwritten answer is in the attached photo(s). First transcribe exactly what they wrote. If it's unreadable, say so in readAs and mark only what you can read.":""}
+${typed?"Student's typed answer: "+JSON.stringify(typed):""}
+Then give feedback:
+- points: for EACH mark scheme point, whether it was awarded and a short reason.
+- wording: up to 4 phrases from the student's answer that were vague or imprecise, each with the precise examiner-friendly wording (quote the student's words exactly in "yours"). Empty if their wording was already precise.
+- wentWrong: 1–3 sentences on the main mistake or what was missing. Speak to the student as "you".
+- misconception: if the answer shows an actual misunderstanding (not just a missing point), name it in one sentence and correct it; otherwise "".
+- missed: short labels (max 8 words each) for each concept the student lost marks on, e.g. "role of troponin in exposing binding sites".
+- nextTip: one short, specific tip for this topic.
+- annotations: mark up the student's own answer like a teacher with a red/green pen. Include 3–10 items:
+  • "correct" for each phrase that earned a mark (note = which marking point it earned),
+  • "wrong" for each incorrect statement (note = why it's wrong; fix = the corrected wording),
+  • "vague" for wording too imprecise to earn credit (note = why; fix = the precise wording),
+  • "missing" for each marking point they left out entirely (text = "", note = what's missing; fix = the sentence they should add).
+  "text" must be copied EXACTLY from your readAs transcription (a short phrase, max ~12 words) so it can be highlighted.${st.photos.length?`
+  For items visible in a photo, give "photo" (0-based index of the photo) and "box": [x, y, width, height] as fractions 0–1 of that photo's width/height, tightly around where that handwriting appears. Use null for box if unsure or for "missing" items.`:""}
+Reply with ONLY this JSON: {"readAs":string,"annotations":[{"kind":"correct"|"wrong"|"vague"|"missing","text":string,"note":string,"fix":string,"photo":integer|null,"box":[number,number,number,number]|null}],"score":integer,"max":${q.m},"points":[{"point":string,"awarded":boolean,"comment":string}],"wording":[{"yours":string,"better":string}],"wentWrong":string,"misconception":string,"missed":[string],"nextTip":string}`;
+  try{const r=await ask(prompt,st.photos.map(p=>p.blob),"default");
+    const score=Math.max(0,Math.min(q.m,parseInt(r.score)||0));
+    if(!r.readAs&&typed)r.readAs=typed;r.shots=st.photos.map(p=>p.url);
+    finish(Object.assign({},r,{score,max:q.m}));}
+  catch(e){st.busy=false;st.err=aiErr(e);renderStudy()}
+}
+function addWeak(id,arr){if(!arr||!arr.length)return;const W=(S.study.weak[id]=S.study.weak[id]||[]);
+  arr.forEach(p=>{p=String(p).slice(0,140);const i=W.findIndex(w=>w.p===p);if(i>=0)W.splice(i,1);W.push({p,ts:Date.now()})});while(W.length>15)W.shift()}
+function finish(r){const T=TOPIC[st.topic];const q=st.q;st.busy=false;
+  const pct=r.score/r.max;const before=mast(T.id);
+  const fresh=st.mode==="normal"&&!q.review;          /* only fresh questions in normal mode count toward 100 */
+  r.counts=fresh&&!r.skipped;
+  S.study.att.push({t:T.id,l:q.l,s:r.score,m:r.max,ts:Date.now(),k:q.type==="mcq"?"mcq":undefined,x:fresh?undefined:(q.review?"review":"practice")});
+  if(S.study.att.length>1500)S.study.att.splice(0,500);
+  if(fresh){const P=(S.study.p[T.id]=S.study.p[T.id]||{n:0,pass:0,perfect:0});P.n++;if(pct>=PASS&&!r.skipped)P.pass++;if(r.score===r.max&&!r.skipped)P.perfect++}
+  if(!q.review)markDone();
+  /* weak points */
+  const missed=(r.missed&&r.missed.length?r.missed:(r.points||[]).filter(p=>!p.awarded).map(p=>p.point));
+  if(pct<PASS)addWeak(T.id,missed.slice(0,4));
+  /* mistake bank */
+  if(q.review&&!q.instant){const m=S.study.miss[q.key];
+    if(m){if(pct>=PASS){m.box++;if(m.box>=BOX_DAYS.length){delete S.study.miss[q.key];r.cleared=1;toast("Mistake cleared 🎉")}else m.due=Date.now()+BOX_DAYS[m.box]*DAY}
+      else{m.box=0;m.due=Date.now()+DAY}}}
+  else if(pct<PASS&&!q.instant){const clean=Object.assign({},q);delete clean.review;delete clean.instant;
+    const key=q.key||("m"+Date.now().toString(36));S.study.miss[key]={key,t:T.id,q:Object.assign(clean,{key}),box:0,due:Date.now()+DAY,ts:Date.now()}}
+  const after=mast(T.id);
+  if(after>before){r.up=1;toast(`${T.code} upgraded to ${LV[after].n.split(" ·")[0]} 🎉`)}
+  else if(r.counts&&pct>=PASS)toast(r.score===r.max?`Full marks ✓ ${passes(T.id)}/${GOAL}`:`Counts ✓ ${passes(T.id)}/${GOAL}`);
+  if(AI&&st.mode!=="review"){const kind=st.mode==="mcq"?"mcq":"normal",L=nextLevel(T.id);if(queuedCount(T.id,L,kind)<2)fillQueue(T,L,kind).catch(()=>{})}
+  save();st.res=r;st.self=null;window.scrollTo(0,0);renderStudy();
+}
+
+
+/* ================= FOCUS TIMER ================= */
+S.focus=S.focus||{log:{},mode:"focus",end:null,left:null};
+const FMIN={focus:25,brk:5};let actx=null;
+function focusMin(d){return S.focus.log[d]||0}
+function fRemain(){const F=S.focus;if(F.end)return Math.max(0,Math.round((F.end-Date.now())/1000));return F.left!=null?F.left:FMIN[F.mode]*60}
+const mmss=t=>String(Math.floor(t/60)).padStart(2,"0")+":"+String(t%60).padStart(2,"0");
+function focusCard(){const F=S.focus,t=fRemain(),run=!!F.end;
+  return `<div class="qcard" style="padding:14px 16px"><div class="focus"><div><div style="font-size:12.5px;color:var(--mute)">${F.mode==="focus"?"⏱ Focus session":"☕ Break"}</div><div class="clock" id="fclock" style="color:${F.mode==="focus"?"var(--violet)":"var(--accent)"}">${mmss(t)}</div><div style="font-size:12px;color:var(--mute);margin-top:4px">${focusMin(today())} min focused today</div></div>
+   <div style="flex:1;display:grid;gap:6px">${run?`<button class="btn sm" data-act="fpause">Pause</button>`:`<button class="btn sm vio" data-act="fstart">${F.left!=null?"Resume":"Start"}</button>`}
+   <div class="row2" style="gap:6px"><button class="btn sm" data-act="freset">Reset</button><button class="btn sm" data-act="fswitch">${F.mode==="focus"?"Break":"Focus"}</button></div></div></div></div>`}
+function fStart(){const F=S.focus;F.end=Date.now()+fRemain()*1000;F.left=null;save();
+  try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();actx.resume&&actx.resume()}catch(e){}renderStudy()}
+function fPause(){const F=S.focus;F.left=fRemain();F.end=null;save();renderStudy()}
+function fReset(){const F=S.focus;F.end=null;F.left=null;save();renderStudy()}
+function fSwitch(){const F=S.focus;F.mode=F.mode==="focus"?"brk":"focus";F.end=null;F.left=null;save();renderStudy()}
+function beep(){try{if(!actx)return;[0,.25,.5].forEach(d=>{const o=actx.createOscillator(),g=actx.createGain();o.frequency.value=880;g.gain.setValueAtTime(.0001,actx.currentTime+d);g.gain.exponentialRampToValueAtTime(.3,actx.currentTime+d+.02);g.gain.exponentialRampToValueAtTime(.0001,actx.currentTime+d+.2);o.connect(g).connect(actx.destination);o.start(actx.currentTime+d);o.stop(actx.currentTime+d+.22)})}catch(e){}}
+setInterval(()=>{const F=S.focus;if(!F.end)return;const t=fRemain();const el=$("fclock");if(el)el.textContent=mmss(t);
+  if(t<=0){if(F.mode==="focus"){const d=today();F.log[d]=(F.log[d]||0)+FMIN.focus;toast("Focus session done 🔥 Take 5");F.mode="brk";
+      if(S.notif&&S.notif.focus)notify("Focus session done 🔥","25 minutes banked. Take a 5-minute break.","focus","study")}
+    else{toast("Break over. Back to it 💪");F.mode="focus";if(S.notif&&S.notif.focus)notify("Break's over 💪","Time for another focus session.","focus","study")}
+    F.end=null;F.left=null;save();beep();if(cur==="study"&&!st.topic)renderStudy();if(cur==="home")renderHome()}},1000);
+
+/* ================= KEY TERMS DRILL ================= */
+function lev(a,b){const m=a.length,n=b.length;if(!m)return n;if(!n)return m;let p=Array.from({length:n+1},(_,j)=>j);
+  for(let i=1;i<=m;i++){const c=[i];for(let j=1;j<=n;j++)c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+(a[i-1]===b[j-1]?0:1));p=c}return p[n]}
+const norm=x=>String(x||"").toLowerCase().replace(/[’']/g,"").replace(/[^a-z0-9]+/g," ").trim();
+function termMatch(ans,term,alts){const a=norm(ans);if(!a)return false;return [term].concat(alts||[]).some(t=>{const b=norm(t);return a===b||lev(a,b)<=Math.max(1,Math.floor(b.length/5))})}
+async function startTerms(){const T=TOPIC[st.topic];await aiReady;st.mode="terms";
+  if(!AI){st.err="Key terms need the AI. Add your API key in Home → AI settings.";st.mode="normal";return renderStudy()}
+  st.busy=true;st.err=null;st.terms=null;renderStudy();
+  const seenT=(S.study.termsSeen=S.study.termsSeen||{})[T.id]||[];
+  const prompt=`You are an expert ${T.subj.board} A-level ${T.subj.name} teacher. List 8 key terms from specification topic ${T.code} "${T.name}" with the definition exactly as an exam mark scheme / the endorsed textbook would phrase it. Include the trickiest, most-confused terms. Prefer terms not in: ${JSON.stringify(seenT.slice(-30))}.
+The student will be shown the DEFINITION and must type the TERM, so the definition must not contain the term itself. Add accepted alternative spellings/names in "alts".
+Reply with ONLY this JSON: {"terms":[{"term":string,"definition":string,"alts":[string]}]}`;
+  try{const r=await ask(prompt,null,"default");const list=(r.terms||[]).filter(x=>x&&x.term&&x.definition).slice(0,10);if(!list.length)throw new Error("Couldn't get key terms. Try again.");
+    const sn=(S.study.termsSeen[T.id]=seenT.concat(list.map(x=>String(x.term))));while(sn.length>60)sn.shift();save();
+    st.terms={list,i:0,ok:0,input:"",state:null,wrong:[]}}catch(e){st.err=aiErr(e);st.mode="normal"}
+  st.busy=false;renderStudy()}
+function tCheck(skip){const S2=st.terms;if(!S2||S2.state)return;const k=S2.list[S2.i];const ok=!skip&&termMatch(S2.input,k.term,k.alts);
+  S2.state=ok?"ok":"no";if(ok)S2.ok++;else{S2.wrong.push(k.term);addWeak(st.topic,["Key term: "+k.term])}save();renderStudy()}
+function termsHtml(){const S2=st.terms,n=S2.list.length;
+  if(S2.i>=n){const pct=S2.ok/n;return `<div class="res"><div class="score" style="color:${pct>=PASS?"var(--good)":pct>=.5?"var(--amber)":"var(--warn)"}">${S2.ok}/${n}</div><small style="color:var(--mute)">key terms correct${S2.wrong.length?" · missed terms added to your weak points":""}</small>
+    ${S2.wrong.length?`<div class="model" style="margin-top:10px">Revise: ${S2.wrong.map(esc).join(", ")}</div>`:""}</div>
+    <button class="btn vio wide" data-act="tagain">Another 8 terms</button><button class="btn wide" data-act="tdone" style="margin-top:8px;background:none;color:var(--mute)">Finish</button>`}
+  const k=S2.list[S2.i];
+  let h=`<div class="note" style="margin-bottom:10px;padding:8px 12px">🔤 Key terms ${S2.i+1}/${n}: read the definition, type the word. Practice only.</div>
+   <div class="qcard"><div class="qtext">${esc(k.definition)}</div>
+   <input id="termIn" class="term-in" style="margin-top:12px" placeholder="Type the key term…" autocomplete="off" autocapitalize="off" value="${esc(S2.input)}" ${S2.state?"disabled":""}>`;
+  if(!S2.state)h+=`<div class="row2" style="margin-top:10px"><button class="btn pri" data-act="tcheck">Check</button><button class="btn" data-act="tskip">Don't know</button></div></div>`;
+  else h+=`<div style="margin-top:12px;font-size:16px"><b style="color:${S2.state==="ok"?"var(--good)":"var(--warn)"}">${S2.state==="ok"?"✓ Correct":"✗ It's"}</b> <b>${esc(k.term)}</b></div></div><button class="btn vio wide" data-act="tnext">${S2.i+1<n?"Next term":"See score"}</button>`;
+  return h}
+
+/* ================= NOTIFICATIONS (APK / installed app only) ================= */
+S.notif=S.notif||{focus:true,daily:true};
+const HOSTED_IN_CLAUDE=/claude\.(ai|site)|claudeusercontent/.test(location.hostname);
+const notifSupported=()=>!HOSTED_IN_CLAUDE&&"Notification" in window&&"serviceWorker" in navigator&&(location.protocol==="https:"||location.hostname==="localhost");
+async function swReg(){try{return await Promise.race([navigator.serviceWorker.ready,new Promise(r=>setTimeout(()=>r(null),4000))])}catch(e){return null}}
+async function notify(title,body,tag,hash){
+  if(!notifSupported()||Notification.permission!=="granted")return false;
+  const reg=await swReg();if(!reg)return false;
+  try{await reg.showNotification(title,{body,tag:tag||"grindtime",icon:"icon-192.png",badge:"icon-192.png",data:{url:"./#"+(hash||"home")},renotify:true});return true}catch(e){return false}}
+/* A small summary for the service worker's daily check (it can't read localStorage). */
+let nudgeT=null;
+function queueNudge(){if(!notifSupported()||!("caches" in window))return;clearTimeout(nudgeT);nudgeT=setTimeout(writeNudge,1500)}
+function writeNudge(){const st8={on:!!(S.notif&&S.notif.daily),date:today(),face:facePct(today()),
+    due:Object.values(S.study.miss||{}).map(m=>m.due),exams:(S.exams||[]).map(e=>({n:e.n,d:e.d})),
+    q:S.study.att.filter(a=>dk(a.ts)===today()&&!a.x).length,last:Date.now()};
+  caches.open("grindtime-nudge").then(c=>c.put("./__nudge",new Response(JSON.stringify(st8),{headers:{"content-type":"application/json"}}))).catch(()=>{})}
+async function setupDaily(){const reg=await swReg();if(!reg||!reg.periodicSync)return "unsupported";
+  try{const p=await navigator.permissions.query({name:"periodic-background-sync"});if(p.state!=="granted")return "blocked"}catch(e){}
+  try{if(S.notif.daily)await reg.periodicSync.register("grindtime-daily",{minInterval:12*3600*1000});else await reg.periodicSync.unregister("grindtime-daily");return "ok"}catch(e){return "blocked"}}
+let dailyStatus=null;
+async function renderNotifBox(){const box=$("notifBox");if(!box)return;
+  if(HOSTED_IN_CLAUDE){box.hidden=true;return}box.hidden=false;const pad=$("notifPad");
+  if(!notifSupported()){$("notifState").textContent="";pad.innerHTML=`<div style="font-size:13px;color:var(--mute)">Notifications work in the installed GrindTime app (the APK, or added to your home screen from your GitHub Pages link).</div>`;return}
+  const perm=Notification.permission;$("notifState").textContent=perm==="granted"?"✓ On":perm==="denied"?"Blocked":"Off";
+  if(perm!=="granted"){pad.innerHTML=perm==="denied"?`<div style="font-size:13px;color:var(--mute)">Notifications are blocked. Turn them on in Android Settings → Apps → GrindTime → Notifications, then come back.</div>`
+     :`<div style="font-size:13px;color:var(--mute);margin-bottom:10px">Get alerts when a focus session or break ends, plus a daily nudge about due mistakes, your face routine and upcoming exams.</div><button class="btn pri wide" id="nOn">Turn on notifications</button>`;
+    const b=$("nOn");if(b)b.onclick=async()=>{try{await Notification.requestPermission()}catch(e){}dailyStatus=await setupDaily();writeNudge();renderNotifBox()};return}
+  queueNudge();
+  if(dailyStatus===null){dailyStatus="…";setupDaily().then(r=>{dailyStatus=r;renderNotifBox()})}
+  const row=(id,t,sub,on)=>`<div class="item ${on?"done":""}" data-n="${id}" style="padding:10px 0"><div class="check"></div><div class="t"><span>${t}</span><small>${sub}</small></div></div>`;
+  pad.innerHTML=row("focus","Focus timer alerts","When a 25-minute session or a break ends",S.notif.focus)+
+    row("daily","Daily nudge","Due mistakes, unfinished face routine, exams in the next week. "+(dailyStatus==="ok"?"Android picks the time, roughly once or twice a day.":dailyStatus==="unsupported"?"Not supported on this phone or browser.":dailyStatus==="blocked"?"Android hasn't allowed background checks yet. This often starts working after you've used the app for a few days.":"Checking…"),S.notif.daily)+
+    `<button class="btn wide" id="nTest" style="margin-top:8px">Send a test notification</button>
+     <div style="font-size:12px;color:var(--mute);margin-top:8px">Timer alerts can arrive a little late if Android pauses the app in the background.</div>`;
+  pad.querySelectorAll("[data-n]").forEach(el=>el.onclick=async()=>{const k=el.dataset.n;S.notif[k]=!S.notif[k];save();if(k==="daily"){dailyStatus=await setupDaily();writeNudge()}renderNotifBox()});
+  $("nTest").onclick=async()=>{const ok=await notify("GrindTime 🔔","Notifications are working.","test","home");if(!ok)toast("Couldn't send. Check Android notification settings")};
+}
+
+/* ================= PWA ================= */
+/* Registers the offline service worker when hosted on its own site (e.g. GitHub Pages). Inside claude.ai this is skipped. */
+if("serviceWorker" in navigator&&(location.protocol==="https:"||location.hostname==="localhost")&&!/claude\.(ai|site)|claudeusercontent/.test(location.hostname)){
+  window.addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})})}
+
+/* ================= BOOT ================= */
+show(location.hash.slice(1));
+let lastDay=today();setInterval(()=>{if(today()!==lastDay){lastDay=today();if(!openId)render()}},60000);
+})();
+</script>
+</body>
+</html>
